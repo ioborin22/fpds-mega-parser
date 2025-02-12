@@ -45,6 +45,7 @@ def parse(params, output):
 
         \b
             fpds parse "LAST_MOD_DATE=[2022/01/01, 2022/05/01]" "AGENCY_CODE=7504"
+            fpds parse "SIGNED_DATE=[2023/01/01,2023/01/01]"
     """
 
     if output:

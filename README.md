@@ -1,113 +1,95 @@
-# fpds
-A no-frills parser for the Federal Procurement Data System (FPDS) found
-[here](https://www.fpds.gov/fpdsng_cms/index.php/en/).
+# FPDS Parser CLI
 
+## Overview
+The FPDS Parser CLI allows users to retrieve federal contract data from the FPDS Atom Feed. The parser supports retrieving data for a specific date or parsing all available data sequentially from **1960/01/01** onward. The data is stored in a database table (`fpds_parser`) to track parsing status and ensure efficient updates.
 
-## Motivation
-The only programmatic access to this data via an ATOM feed limits each
-request to 10 records, which forces users to deal with pagination.
-Additonally, data is exported as XML, which proves annoying for most
-developers. `fpds` will handle all pagination and data
-transformation to provide users with a nice JSON representation of the
-equivalent XML data.
+---
 
+## Commands
 
-## Setup
-To install this package for development, create a virtual environment
-and install dependencies.
-
+### **1. Parse a Specific Date**
+**Command:**
+```sh
+fpds parse YYYY/MM/DD
 ```
-$ python3.10 -m venv venv
-$ source venv/bin/activate
-$ pip install -e .
+**Example:**
+```sh
+fpds parse 2023/01/01
+```
+This command:
+- Fetches contract data for the specified date using `SIGNED_DATE=YYYY/MM/DD`.
+- Stores the JSON output in the folder structure: `/Users/iliaoborin/fpds/data/{year}/{MM_DD}.json`.
+- Updates or inserts the parsed date in the `fpds_parser` table:
+  - If the date exists, it updates `last_run_at`.
+  - If the date does not exist, it creates a new entry with `first_run_at` set to the current timestamp.
+
+---
+
+### **2. Parse All Available Data**
+**Command:**
+```sh
+fpds parse all
+```
+This command:
+- Starts parsing data sequentially from **1960/01/01** onward.
+- Iterates over each day, checking the `fpds_parser` table to determine if the date was already processed.
+- Downloads and stores each day's data as JSON in `/Users/iliaoborin/fpds/data/{year}/{MM_DD}.json`.
+- Updates the `fpds_parser` table after processing each day.
+- If interrupted, the next run resumes from the last unprocessed date.
+
+---
+
+## Database Schema (`fpds_parser` Table)
+```sql
+CREATE TABLE `fpds_parser` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `first_run_at` DATETIME NOT NULL,  -- Date of the first parsing run
+    `status` VARCHAR(50) NOT NULL,     -- Parsing status (e.g., "pending", "completed", "error")
+    `last_run_at` DATETIME DEFAULT NULL, -- Date of the last parsing run
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+**Status Field Values:**
+- `pending` - The date is scheduled for parsing.
+- `in_progress` - The date is currently being parsed.
+- `completed` - The data for this date has been successfully parsed.
+- `error` - An issue occurred during parsing.
+
+---
+
+## Execution Flow
+1. **Check the database** (`fpds_parser`) to determine the parsing status of a given date.
+2. **If the date is not in the table:**
+   - Insert a new record with `first_run_at = CURRENT_TIMESTAMP` and `status = 'pending'`.
+3. **If the date exists but is not completed:**
+   - Update `status = 'in_progress'` and attempt to fetch the data.
+4. **Download the data** from FPDS using the `SIGNED_DATE=YYYY/MM/DD` parameter.
+5. **Save the JSON file** in `/fpds/data/{year}/{MM_DD}.json`.
+6. **Update the database**:
+   - If parsing is successful, set `status = 'completed'` and update `last_run_at`.
+   - If parsing fails, set `status = 'error'`.
+
+---
+
+## Example Usage
+```sh
+# Parse a specific date
+fpds parse 2024/01/01
+
+# Parse all available data from 1960/01/01 onward
+fpds parse all
 ```
 
-## Usage
-For a list of valid search criteria parameters, consult FPDS documentation
-found [here](https://www.fpds.gov/wiki/index.php/Atom_Feed_Usage). Parameters
-will follow the `URL String` format shown in the link above, with the
-following exceptions:
+---
 
- + Colons (:) will be replaced by equal signs (=)
- + Certain parameters enclose their value in quotations. `fpds` will
-automatically determine if quotes are needed, so simply enclose your
-entire criteria string in quotes.
+## Future Enhancements
+- Implement multi-threaded downloading for improved efficiency.
+- Add retry mechanisms for handling network failures.
+- Create a web dashboard for monitoring parsing progress.
 
- For example, `AGENCY_CODE:"3600"` should be used as `"AGENCY_CODE=3600"`.
+---
 
-Via CLI:
-```
-$  fpds parse "LAST_MOD_DATE=[2022/01/01, 2022/05/01]" "AGENCY_CODE=7504"
-```
+## Contact
+For issues or contributions, please contact **iliaoborin@getwabinc.com** or submit a GitHub issue.
 
-By default, data will be dumped into an `.fpds` folder at the user's
-`$HOME` directory. If you wish to override this behavior, provide the `-o`
-option. The directory will be created if it doesn't exist:
-
-```
-$  fpds parse "LAST_MOD_DATE=[2022/01/01, 2022/05/01]" "AGENCY_CODE=7504" -o my-preferred-directory
-```
-
-Same request via python interpreter:
-```
-import asyncio
-from itertools import chain
-from fpds import fpdsRequest
-
-request = fpdsRequest(
-    LAST_MOD_DATE="[2022/01/01, 2022/05/01]",
-    AGENCY_CODE="7504"
-)
-
-# results are nested lists so de-nest
-data = asyncio.run(request.data())
-records = list(chain.from_iterable(data))
-```
-
-For linting and formatting, we use `flake8` and `black`.
-
-```
-$ make lint
-$ make formatters
-```
-
-Lastly, you can clean the clutter and unwanted noise.
-
-```
-$ make clean
-```
-
-### Testing
-```
-$ make local-test
-```
-
-## What's New
-As of 08/21/2024, `v1.4.1` data is returned as a generator, providing more flexibility
-for memory constrained devices. Users also have the ability to select specific
-pages of results with the `page` parameter.
-
-Parameters in `fields.json` have been updated to support unbounded values. Previously, range-based parameters had to define an upper & lower bound (i.e. `[4250, 7500]`). In the most current version of this library, you can now specify the following patterns for all range parameters: `[4250,)` or `(, 7500]`. This even works for dates: `[2022/08/22,)` or `(, 2022/08/01]`!
-
-`fpds` now supports asynchronous requests! As of `v1.3.0`, users can instantiate
-the class as usual, but will now need to call the `process_records` method
-to get records as JSON. Note: due to some recursive function calls in the XML
-parsing, users might experience some high completion times for this function
-call. Recommendation is to limit the number of results.
-
-#### Timing Benchmarks (in seconds):
-
-| v1.2.1 | v.1.3.0 |
--------- | --------
-188.46   | 29.40
-190.38   | 28.14
-187.20   | 27.66
-
-Using `v.1.2.1`, the average completion time is 188.68 seconds (~3min).
-Using `v.1.3.0`, the average completion time is 28.40 seconds.
-
-This equates to a <u>**84.89%**</u> decrease in completion time!
-
-
-As of `v1.3.0`, `fpds` now supports the use of over 100 keyword tags when searching
-for contracts using the `v1.5.3` ATOM feed.
