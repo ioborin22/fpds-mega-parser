@@ -1,0 +1,8 @@
+# Выбери тип БД (mysql, postgresql, sqlite)
+DB_TYPE=mysql
+
+DB_HOST=localhost
+DB_PORT=8889
+DB_NAME=fpds
+DB_USER=root
+DB_PASSWORD=root
