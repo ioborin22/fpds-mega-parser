@@ -33,7 +33,7 @@ pip install -r requirements.txt
 Initialize and apply database migrations:
 
 ```sh
-alembic upgrade head
+alembic downgrade base && alembic upgrade head
 ```
 
 This will create the necessary tables (`contracts` and `parser_stage`) in your database.
