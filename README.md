@@ -68,9 +68,9 @@ This command:
 fpds parse all
 ```
 This command:
-- Starts parsing data sequentially from **1960/01/01** onward.
+- Starts parsing data sequentially from **1957/10/01** onward.
 - Iterates over each day, checking the `parser_stage` table to determine if the date was already processed.
-- Downloads and stores each day's data as JSON in `/Users/iliaoborin/fpds/data/{year}/{MM_DD}.json`.
+- Downloads and stores each day’s data as JSON in the directory specified in the .env file `(DATA_DIR)`.
 - Updates the `parser_stage` table after processing each day.
 - If interrupted, the next run resumes from the last unprocessed date.
 
