@@ -32,7 +32,7 @@ def log_parsing_result(parsed_date, file_path, status, update=False):
     
     cursor = conn.cursor()
     
-    # Цветные статусы
+    # Colored statuses
     status_colors = {
         "completed": "green",
         "pending": "yellow",
@@ -80,60 +80,60 @@ def save_contracts_to_db(parsed_date, file_path):
     cursor = conn.cursor()
 
     try:
-        # Загружаем JSON
+        # Loading JSON
         with open(file_path, "r") as file:
             contracts = json.load(file)
 
-        # Создаем директорию для контрактов
+        # Create a directory for contracts
         contracts_dir = Path(f"/Users/iliaoborin/fpds/data/{parsed_date}/contracts")
         contracts_dir.mkdir(parents=True, exist_ok=True)
 
-        saved_count = 0  # Счетчик успешных сохранений
-        lost_contracts = []  # Пропущенные контракты
-        mod_counters = {}  # Счетчик модификаций PIID
+        saved_count = 0 # Successful save counter
+        lost_contracts = [] # Missed contracts
+        mod_counters = {} # PIID modification counter
 
         for contract in contracts:
-            # Извлекаем идентификатор контракта (PIID) или IDV_PIID
+            # Extract the contract identifier (PIID) or IDV_PIID
             piid = contract.get("content__award__awardID__awardContractID__PIID") or \
                    contract.get("content__IDV__contractID__IDVID__PIID")
 
             if not piid:
                 click.echo("🚫 Пропущен контракт без PIID и IDV_PIID!")
-                continue  # Пропускаем контракты без идентификатора
+                continue  # Skip contracts without identifier
             
-            # Получаем номер модификации
+            # Get the modification number
             mod_number = contract.get("content__award__awardID__awardContractID__modNumber")
             
-            # Если mod_number не "0", не пустой и не None → добавляем к названию файла
+            # If mod_number is not "0", not empty and not None → add to file name
             if mod_number and mod_number != "0":
                 file_piid = f"{piid}_mod_{mod_number}"
             else:
-                file_piid = piid  # Оставляем оригинальный PIID для первой версии
+                file_piid = piid # Leave the original PIID for the first version
 
-            # Генерируем путь к файлу контракта
+            # Generate path to contract file
             contract_file_path = contracts_dir / f"{file_piid}.json"
 
-            # Определяем путь к файлу логов
+            # Define the path to the log file
             error_log_path = contracts_dir / "errors.log"
 
             try:
-                # Записываем контракт в файл
+                # Write the contract to the file
                 with open(contract_file_path, "w") as contract_file:
-                    json.dump(contract, contract_file, indent=4)  # Красивый JSON
+                    json.dump(contract, contract_file, indent=4) # Beautiful JSON
 
-                saved_count += 1  # Увеличиваем счетчик
+                saved_count += 1  # Increase the counter
 
             except Exception as file_error:
-                # Формируем сообщение ошибки
+                # Generate an error message
                 error_message = f"{datetime.now().isoformat()} - Ошибка записи контракта {file_piid}: {file_error}\n"
                 
-                # Записываем ошибку в лог-файл
+                # Write the error to the log file
                 with open(error_log_path, "a") as error_log:
                     error_log.write(error_message)
 
-                continue  # Переход к следующему контракту
+                continue  # Move to the next contract
 
-            # Определяем тип контракта
+            # Determine the type of contract
             if "content__IDV" in contract:
                 contract_type = "IDV"
             elif "content__award" in contract:
@@ -141,13 +141,13 @@ def save_contracts_to_db(parsed_date, file_path):
             else:
                 contract_type = "UNKNOWN"
 
-            # Заполняем поля в зависимости от типа контракта
+            # Fill in the fields depending on the type of contract
             if contract_type == "IDV":
                 piid = contract.get("content__award__awardID__awardContractID__PIID", None)
                 idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
                 referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
                 mod_number = contract.get("content__IDV__contractID__IDVID__modNumber", None)
-                transaction_number = None  # У IDV контрактов нет transactionNumber
+                transaction_number = None  # IDV contracts do not have transactionNumber
                 signed_date = contract.get("content__IDV__relevantContractDates__signedDate", None)
                 effective_date = contract.get("content__IDV__relevantContractDates__effectiveDate", None)
                 current_completion_date = contract.get("content__IDV__relevantContractDates__lastDateToOrder", None)
@@ -189,12 +189,12 @@ def save_contracts_to_db(parsed_date, file_path):
             else:
                 error_message = f"{datetime.now().isoformat()} - ⚠️ Неизвестный тип контракта: {json.dumps(contract, indent=2, ensure_ascii=False)}\n"
 
-                # Записываем ошибку в лог-файл
+                # Write the error to the log file
                 with open(error_log_path, "a", encoding="utf-8") as error_log:
                     error_log.write(error_message)
                 return
 
-            # Подготовка данных для вставки в БД
+            # Preparing data for insertion into the DB
             contract_data = (
                 piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                 effective_date, current_completion_date, obligated_amount, 
@@ -204,7 +204,7 @@ def save_contracts_to_db(parsed_date, file_path):
                 number_of_offers_received, extent_competed, str(contract_file_path)
             )
 
-            # Вставка в БД (без дубликатов)
+            # Insert into DB (no duplicates)
             try:
                 cursor.execute("""
                     INSERT INTO contracts (

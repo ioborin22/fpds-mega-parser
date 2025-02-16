@@ -1,0 +1,21 @@
+https://www.fpds.gov/ezsearch/FEEDS/ATOM?s=FPDS&FEEDNAME=PUBLIC&q=SIGNED_DATE:[2023/01/01,2023/01/01]
+
+	• SIGNED_DATE:[2023/01/01,2023/01/01] – filter by signing date.
+	• Returns ATOM XML with information about found contracts.
+
+https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&q=PIID:19BE2023A0029
+
+
+	• PIID:19BE2023A0029 – filter by unique contract identifier.
+	• Returns ATOM XML with detailed information on this contract.
+
+
+https://www.fpds.gov/ezsearch/FEEDS/ATOM?s=FPDS&FEEDNAME=PUBLIC&q=*:*&start=0
+
+
+	• q=*:* – means “select all”.
+	• start=0 – means that records from the first page are returned.
+	• Used to page through all contracts in FPDS.
+
+	
+https://www.fpds.gov/wiki/index.php/Atom_Feed_Usage

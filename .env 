@@ -1,4 +1,4 @@
-# Выбери тип БД (mysql, postgresql, sqlite)
+# Select DB type (mysql, postgresql, sqlite)
 DB_TYPE=mysql
 
 DB_HOST=localhost
