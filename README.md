@@ -1,7 +1,6 @@
 # FPDS Parser CLI
 
 ## Overview
-## Overview
 The **FPDS Parser CLI** is designed to extract the entire **FPDS dataset**, storing each contract as a **separate file** while recording key contract details in a **database**. This enables users to maintain a **local FPDS database** for efficient contract analysis. 
 
 To optimize storage, files are saved in **Parquet format**, while the database retains critical metadata, including **contract numbers (PIID), dates, obligated amounts, agency identifiers, NAICS codes, PSC codes, and vendor UEI**.
