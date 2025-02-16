@@ -10,18 +10,19 @@ To optimize storage, files are saved in **Parquet format**, while the database r
 ## Setup
 
 ### **1. Configure `.env` File**
-Before running the application, create a `.env` file in the root directory and configure your database settings:
+Before running the application, update the .env file in the root directory with your database and file storage settings:
 
 ```
-# Choose database type (mysql, postgresql, sqlite)
-DB_TYPE=mysql
+# Database Configuration
+DB_TYPE=mysql       # Choose database type (mysql, postgresql, sqlite)
+DB_HOST=localhost   # Database host
+DB_PORT=8889        # Database port
+DB_NAME=fpds        # Database name
+DB_USER=root        # Database user
+DB_PASSWORD=root    # Database password
 
-# Database connection settings
-DB_HOST=localhost
-DB_PORT=8889
-DB_NAME=fpds
-DB_USER=root
-DB_PASSWORD=root
+# Data Storage Configuration
+DATA_DIR=/path/to/storage  # Set the directory where contract files will be stored
 ```
 
 ### **2. Install Dependencies**
