@@ -84,12 +84,10 @@ def save_contracts_to_db(parsed_date, file_path):
             contracts = json.load(file)
 
         # Create a directory for contracts
-        contracts_dir = Path(os.getenv("DATA_DIR")) / str(parsed_date) / "contracts"
+        contracts_dir = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/"))
         contracts_dir.mkdir(parents=True, exist_ok=True)
 
         saved_count = 0 # Successful save counter
-        lost_contracts = [] # Missed contracts
-        mod_counters = {} # PIID modification counter
 
         for contract in contracts:
             # Extract the contract identifier (PIID) or IDV_PIID
@@ -110,18 +108,14 @@ def save_contracts_to_db(parsed_date, file_path):
                 file_piid = piid # Leave the original PIID for the first version
 
             # Generate path to contract file
-            contract_file_path = contracts_dir / f"{file_piid}.json"
+            contract_file_path = None
 
             # Define the path to the log file
             error_log_path = contracts_dir / "errors.log"
 
             try:
-                # Write the contract to the file
-                with open(contract_file_path, "w") as contract_file:
-                    json.dump(contract, contract_file, indent=4) # Beautiful JSON
-
-                saved_count += 1  # Increase the counter
-
+                contract_file_path = None
+                saved_count += 1
             except Exception as file_error:
                 # Generate an error message
                 error_message = f"{datetime.now().isoformat()} - Contract recording error {file_piid}: {file_error}\n"
@@ -165,7 +159,7 @@ def save_contracts_to_db(parsed_date, file_path):
 
             elif contract_type == "AWARD":
                 piid = contract.get("content__award__awardID__awardContractID__PIID", None)
-                idv_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
+                idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
                 referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
                 mod_number = contract.get("content__award__awardID__awardContractID__modNumber", None)
                 transaction_number = contract.get("content__award__awardID__awardContractID__transactionNumber", None)
@@ -200,12 +194,12 @@ def save_contracts_to_db(parsed_date, file_path):
                 base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
                 naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
                 funding_requesting_agency_id, funding_requesting_office_id, 
-                number_of_offers_received, extent_competed, str(contract_file_path)
+                number_of_offers_received, extent_competed, str(Path(file_path).with_suffix(".parquet"))
             )
 
             # Insert into DB (no duplicates)
             try:
-                cursor.execute("""
+                cursor.executemany("""
                     INSERT INTO contracts (
                         piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                         effective_date, current_completion_date, obligated_amount, 
@@ -219,11 +213,11 @@ def save_contracts_to_db(parsed_date, file_path):
                         %s, %s, %s, %s, %s, 
                         %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
-                """ , contract_data)
+                """ , [contract_data])
 
             except mysql.connector.IntegrityError:
-                click.echo(f"⚠️ Дубликат PIID в БД {piid} найден! Принудительно добавляем новую запись.")
-                cursor.execute("""
+                click.echo(f"⚠️ Duplicate PIID in DB {piid} found! Forcedly adding a new record.")
+                cursor.executemany("""
                     INSERT INTO contracts (
                         piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                         effective_date, current_completion_date, obligated_amount, 
@@ -237,10 +231,14 @@ def save_contracts_to_db(parsed_date, file_path):
                         %s, %s, %s, %s, %s, 
                         %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
-                """ , contract_data)
+                """ , [contract_data])
 
         conn.commit()
         click.echo(f"📄 Successfully saved {saved_count} contracts out of {len(contracts)}")
+
+        # Remove original JSON file
+        os.remove(file_path)
+        click.echo(f"🗑 Deleted JSON file: {file_path}")
 
     except Exception as e:
         click.echo(f"⚠️ Contract parsing error: {e}")
@@ -262,7 +260,7 @@ def parse(date, output):
 
     # Check if the data already exists in the database before downloading
     year, month, day = date.split("/")
-    DATA_FILE = Path(os.getenv("DATA_DIR")) / str(year) / f"{month}_{day}.json"
+    DATA_FILE = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
     if not log_parsing_result(date, str(DATA_FILE), "pending"):
         return
 
@@ -287,12 +285,29 @@ def parse(date, output):
         records = list(chain.from_iterable(data))
 
         # Create directory if it does not exist
-        DATA_DIR = Path(os.getenv("DATA_DIR")) / str(year)
+        DATA_DIR = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year)
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         
         # Save data to file
         with open(DATA_FILE, "w") as outfile:
             json.dump(records, outfile)
+
+        click.echo(f"📄 Saved {len(records)} records as JSON: {DATA_FILE}")
+
+        # Convert JSON to Parquet
+        parquet_file = DATA_FILE.with_suffix(".parquet")  # Replace the extension .json → .parquet
+
+        # Load JSON
+        with open(DATA_FILE, "r") as f:
+            data = json.load(f)
+
+        # Convert to DataFrame
+        df = pd.DataFrame(data)
+
+        # Save to Parquet
+        df.to_parquet(parquet_file, engine="pyarrow", compression="snappy")  # or "gzip", "zstd"
+
+        click.echo(f"🎯 JSON successfully converted to Parquet: {parquet_file}")
 
         log_parsing_result(date, str(DATA_FILE), "completed", update=True)
 
