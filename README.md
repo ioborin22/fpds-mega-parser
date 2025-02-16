@@ -153,19 +153,8 @@ CREATE TABLE `contracts` (
 # Parse a specific date
 fpds parse 2024/01/01
 
-# Parse all available data from 1960/01/01 onward
+# Parse all available data from 1957/10/01 onward
 fpds parse all
 ```
 
 ---
-
-## Future Enhancements
-- Implement multi-threaded downloading for improved efficiency.
-- Add retry mechanisms for handling network failures.
-- Create a web dashboard for monitoring parsing progress.
-
----
-
-## Contact
-For issues or contributions, please contact **iliaoborin@getwabinc.com** or submit a GitHub issue.
-
