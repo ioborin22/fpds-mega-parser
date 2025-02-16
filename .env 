@@ -6,3 +6,5 @@ DB_PORT=8889
 DB_NAME=fpds
 DB_USER=root
 DB_PASSWORD=root
+
+DATA_DIR="/Users/iliaoborin/fpds/data/"

@@ -2,12 +2,12 @@ import asyncio
 import json
 import mysql.connector
 import click
-from datetime import datetime
+import os
+import pandas as pd
 
+from datetime import datetime
 from itertools import chain
 from pathlib import Path
-
-import click
 from click import UsageError
 
 from fpds import fpdsRequest
@@ -47,7 +47,7 @@ def log_parsing_result(parsed_date, file_path, status, update=False):
             (status, parsed_date)
         )
         conn.commit()
-        click.echo(f"📝 Parsing status updated for {parsed_date}: {colored_status}")  # Вывод цветного текста
+        click.echo(f"📝 Parsing status updated for {parsed_date}: {colored_status}")
     else:
         cursor.execute("SELECT 1 FROM parser_stage WHERE parsed_date = %s", (parsed_date,))
         exists = cursor.fetchone()
@@ -69,12 +69,11 @@ def log_parsing_result(parsed_date, file_path, status, update=False):
     return True
 
 def save_contracts_to_db(parsed_date, file_path):
-    
-    """Парсит JSON-файл и сохраняет ВСЕ контракты в БД и файлы"""
+    """Parses JSON file and saves ALL contracts to the database and as Parquet files"""
 
     conn = get_db_connection()
     if conn is None:
-        click.echo("⚠️ Не удалось подключиться к базе данных")
+        click.echo("⚠️ Failed to connect to the database.")
         return
 
     cursor = conn.cursor()
@@ -85,7 +84,7 @@ def save_contracts_to_db(parsed_date, file_path):
             contracts = json.load(file)
 
         # Create a directory for contracts
-        contracts_dir = Path(f"/Users/iliaoborin/fpds/data/{parsed_date}/contracts")
+        contracts_dir = Path(os.getenv("DATA_DIR")) / str(parsed_date) / "contracts"
         contracts_dir.mkdir(parents=True, exist_ok=True)
 
         saved_count = 0 # Successful save counter
@@ -98,7 +97,7 @@ def save_contracts_to_db(parsed_date, file_path):
                    contract.get("content__IDV__contractID__IDVID__PIID")
 
             if not piid:
-                click.echo("🚫 Пропущен контракт без PIID и IDV_PIID!")
+                click.echo("🚫 Contract without PIID and IDV_PIID skipped!")
                 continue  # Skip contracts without identifier
             
             # Get the modification number
@@ -125,7 +124,7 @@ def save_contracts_to_db(parsed_date, file_path):
 
             except Exception as file_error:
                 # Generate an error message
-                error_message = f"{datetime.now().isoformat()} - Ошибка записи контракта {file_piid}: {file_error}\n"
+                error_message = f"{datetime.now().isoformat()} - Contract recording error {file_piid}: {file_error}\n"
                 
                 # Write the error to the log file
                 with open(error_log_path, "a") as error_log:
@@ -187,7 +186,7 @@ def save_contracts_to_db(parsed_date, file_path):
                 extent_competed = contract.get("content__award__competition__extentCompeted", None)
 
             else:
-                error_message = f"{datetime.now().isoformat()} - ⚠️ Неизвестный тип контракта: {json.dumps(contract, indent=2, ensure_ascii=False)}\n"
+                error_message = f"{datetime.now().isoformat()} - ⚠️ Unknown contract type: {json.dumps(contract, indent=2, ensure_ascii=False)}\n"
 
                 # Write the error to the log file
                 with open(error_log_path, "a", encoding="utf-8") as error_log:
@@ -241,10 +240,10 @@ def save_contracts_to_db(parsed_date, file_path):
                 """ , contract_data)
 
         conn.commit()
-        click.echo(f"📄 Успешно сохранено {saved_count} контрактов из {len(contracts)}")
+        click.echo(f"📄 Successfully saved {saved_count} contracts out of {len(contracts)}")
 
     except Exception as e:
-        click.echo(f"⚠️ Ошибка парсинга контрактов: {e}")
+        click.echo(f"⚠️ Contract parsing error: {e}")
 
     finally:
         conn.close()
@@ -263,7 +262,7 @@ def parse(date, output):
 
     # Check if the data already exists in the database before downloading
     year, month, day = date.split("/")
-    DATA_FILE = Path(f"/Users/iliaoborin/fpds/data/{year}/{month}_{day}.json")
+    DATA_FILE = Path(os.getenv("DATA_DIR")) / str(year) / f"{month}_{day}.json"
     if not log_parsing_result(date, str(DATA_FILE), "pending"):
         return
 
@@ -288,7 +287,7 @@ def parse(date, output):
         records = list(chain.from_iterable(data))
 
         # Create directory if it does not exist
-        DATA_DIR = Path(f"/Users/iliaoborin/fpds/data/{year}")
+        DATA_DIR = Path(os.getenv("DATA_DIR")) / str(year)
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         
         # Save data to file
