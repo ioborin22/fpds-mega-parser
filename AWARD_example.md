@@ -1062,137 +1062,791 @@
 # Описание: Указывает, является ли организация федеральным правительственным учреждением США.
 # Формат: Булево (Boolean), `"true"` или `"false"`.
 # Важность для анализа: Средняя – полезно для анализа контрактов с федеральными правительственными учреждениями США.
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness": "\n              ",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isCommunityDevelopmentCorporation": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isDomesticShelter": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isEducationalInstitution": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isFoundation": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHospital": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isManufacturerOfGoods": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isVeterinaryHospital": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHispanicServicingInstitution": "false",
-    "content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment": "\n              ",
-    "content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContracts": "false",
-    "content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesGrants": "false",
-    "content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContractsAndGrants": "true",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity": "\n              ",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isAirportAuthority": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isCouncilOfGovernments": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isHousingAuthoritiesPublicOrTribal": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isInterstateEntity": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPlanningCommission": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPortAuthority": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isTransitAuthority": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors": "\n              ",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isSubchapterSCorporation": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isLimitedLiabilityCorporation": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isForeignOwnedAndLocated": "true",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure": "\n                ",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isForProfitOrganization": "true",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isNonprofitOrganization": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isOtherNotForProfitOrganization": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isShelteredWorkshop": "false",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation": "DE",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation__name": "DELAWARE",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation": "USA",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation__name": "UNITED STATES",
-    "content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__organizationalType": "PARTNERSHIP",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity": "\n              ",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1862LandGrantCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1890LandGrantCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1994LandGrantCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isHistoricallyBlackCollegeOrUniversity": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isMinorityInstitution": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isPrivateUniversityOrCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isSchoolOfForestry": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isStateControlledInstitutionofHigherLearning": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isTribalCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isVeterinaryCollege": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isAlaskanNativeServicingInstitution": "false",
-    "content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isNativeHawaiianServicingInstitution": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications": "\n              ",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isDOTCertifiedDisadvantagedBusinessEnterprise": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedSmallDisadvantagedBusiness": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedSmallDisadvantagedBusiness": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AProgramParticipant": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedHUBZoneJointVenture": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedHUBZone": "false",
-    "content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AJointVenture": "false",
-    "content__award__vendor__vendorSiteDetails__vendorLocation": "\n              ",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__streetAddress": "3737 MARSHALL AVE",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__city": "SAINT LOUIS",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__state": "MO",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__state__name": "MISSOURI",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode": "63119",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode__city": "SAINT LOUIS",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__countryCode": "USA",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__countryCode__name": "UNITED STATES",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__phoneNo": "9204618790",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__congressionalDistrictCode": "02",
-    "content__award__vendor__vendorSiteDetails__vendorLocation__entityDataSource": "D&B",
-    "content__award__vendor__vendorSiteDetails__vendorAlternateSiteCode": "63119",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers": "\n              ",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation": "\n                ",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI": "QGUQWSU5AHB4",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEILegalBusinessName": "PERIMETER SOLUTIONS LP",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEI": "LBLLJKAVKL68",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEIName": "PERIMETER SOLUTIONS LP",
-    "content__award__vendor__vendorSiteDetails__entityIdentifiers__cageCode": "1RKV8",
-    "content__award__vendor__vendorSiteDetails__ccrRegistrationDetails": "\n              ",
-    "content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__registrationDate": "2000-09-16 00:00:00",
-    "content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__renewalDate": "2019-05-24 00:00:00",
-    "content__award__vendor__contractingOfficerBusinessSizeDetermination": "O",
-    "content__award__vendor__contractingOfficerBusinessSizeDetermination__description": "OTHER THAN SMALL BUSINESS",
-    "content__award__placeOfPerformance": "\n          ",
-    "content__award__placeOfPerformance__principalPlaceOfPerformance": "\n            ",
-    "content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode": "ID",
-    "content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode__name": "IDAHO",
-    "content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode": "USA",
-    "content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode__name": "UNITED STATES",
-    "content__award__placeOfPerformance__placeOfPerformanceZIPCode": "837055354",
-    "content__award__placeOfPerformance__placeOfPerformanceZIPCode__county": "ADA",
-    "content__award__placeOfPerformance__placeOfPerformanceZIPCode__city": "BOISE",
-    "content__award__placeOfPerformance__placeOfPerformanceCongressionalDistrict": "01",
-    "content__award__competition": "\n          ",
-    "content__award__competition__extentCompeted": "C",
-    "content__award__competition__extentCompeted__description": "NOT COMPETED",
-    "content__award__competition__solicitationProcedures": "SSS",
-    "content__award__competition__solicitationProcedures__description": "ONLY ONE SOURCE",
-    "content__award__competition__idvTypeOfSetAside": "NONE",
-    "content__award__competition__idvTypeOfSetAside__description": "NO SET ASIDE USED.",
-    "content__award__competition__typeOfSetAsideSource": "B",
-    "content__award__competition__typeOfSetAsideSource__description": "IDC",
-    "content__award__competition__evaluatedPreference": "NONE",
-    "content__award__competition__evaluatedPreference__description": "NO PREFERENCE USED",
-    "content__award__competition__reasonNotCompeted": "ONE",
-    "content__award__competition__reasonNotCompeted__description": "ONLY ONE SOURCE-OTHER (FAR 6.302-1 OTHER)",
-    "content__award__competition__idvNumberOfOffersReceived": "1",
-    "content__award__competition__numberOfOffersSource": "B",
-    "content__award__competition__numberOfOffersSource__description": "IDC",
-    "content__award__competition__commercialItemAcquisitionProcedures": "A",
-    "content__award__competition__commercialItemAcquisitionProcedures__description": "COMMERCIAL PRODUCTS/SERVICES",
-    "content__award__competition__commercialItemTestProgram": "N",
-    "content__award__competition__commercialItemTestProgram__description": "NO",
-    "content__award__competition__A76Action": "N",
-    "content__award__competition__A76Action__description": "NO",
-    "content__award__competition__fedBizOpps": "Y",
-    "content__award__competition__fedBizOpps__description": "YES",
-    "content__award__competition__localAreaSetAside": "N",
-    "content__award__competition__localAreaSetAside__description": "NO",
-    "content__award__preferencePrograms": "\n          ",
-    "content__award__preferencePrograms__subcontractPlan": "G",
-    "content__award__preferencePrograms__subcontractPlan__description": "COMMERCIAL SUBCONTRACT PLAN ",
-    "content__award__transactionInformation": "\n          ",
-    "content__award__transactionInformation__createdBy": "LARRYROBILLARD@FS.FED.US",
-    "content__award__transactionInformation__createdDate": "2023-02-07 14:27:43",
-    "content__award__transactionInformation__lastModifiedBy": "LARRYROBILLARD@FS.FED.US",
-    "content__award__transactionInformation__lastModifiedDate": "2023-02-07 15:12:28",
-    "content__award__transactionInformation__status": "F",
-    "content__award__transactionInformation__status__description": "FINAL",
-    "content__award__transactionInformation__approvedBy": "LARRYROBILLARD@FS.FED.US",
-    "content__award__transactionInformation__approvedDate": "2023-02-07 15:12:28",
-    "content__award__transactionInformation__closedStatus": "N",
-    "content__award__genericTags": "\n          ",
-    "content__award__genericTags__genericStrings": "\n            ",
-    "content__award__genericTags__genericStrings__genericString01": "2022-12-29 00:00:00",
-    "content__award__genericTags__genericStrings__genericString02": "QGUQWSU5AHB4"
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness
+# Описание: Контейнер, содержащий информацию о типе бизнеса или области деятельности поставщика.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт информации само по себе, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isCommunityDevelopmentCorporation": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isCommunityDevelopmentCorporation
+# Описание: Указывает, является ли организация корпорацией, занимающейся развитием сообществ.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для поддержки корпораций, занимающихся развитием местных сообществ.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isDomesticShelter": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isDomesticShelter
+# Описание: Указывает, является ли организация приютом для людей в стране.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Низкая – полезно для анализа контрактов, связанных с социальной поддержкой.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isEducationalInstitution": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isEducationalInstitution
+# Описание: Указывает, является ли организация образовательным учреждением.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов с учебными заведениями.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isFoundation": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isFoundation
+# Описание: Указывает, является ли организация фондом.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для определения организаций, работающих в сфере благотворительности.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHospital": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHospital
+# Описание: Указывает, является ли организация больницей.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов в сфере здравоохранения.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isManufacturerOfGoods": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isManufacturerOfGoods
+# Описание: Указывает, является ли организация производителем товаров.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов, связанных с производственными компаниями.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isVeterinaryHospital": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isVeterinaryHospital
+# Описание: Указывает, является ли организация ветеринарной больницей.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Низкая – полезно для контрактов в области ветеринарии.
+
+"content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHispanicServicingInstitution": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLineOfBusiness__isHispanicServicingInstitution
+# Описание: Указывает, является ли организация учреждением, обслуживающим Латиноамериканское сообщество.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – важно для контрактов, направленных на поддержку латиноамериканских организаций.
+"content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment
+# Описание: Контейнер, содержащий информацию о взаимоотношениях поставщика с федеральным правительством.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт данных само по себе, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContracts": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContracts
+# Описание: Указывает, получает ли организация контракты от федерального правительства.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – важно для анализа участия в федеральных тендерах.
+
+"content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesGrants": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesGrants
+# Описание: Указывает, получает ли организация гранты от федерального правительства.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для понимания, поддерживается ли организация федеральными грантами.
+
+"content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContractsAndGrants": "true"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContractsAndGrants
+# Описание: Указывает, получает ли организация как контракты, так и гранты от федерального правительства.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Высокая – важный индикатор для анализа поддержки со стороны федеральных органов.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity
+# Описание: Контейнер для информации о типе государственного учреждения.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт данных само по себе, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isAirportAuthority": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isAirportAuthority
+# Описание: Указывает, является ли организация органом власти аэропорта.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для различения организаций, работающих в авиационной сфере.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isCouncilOfGovernments": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isCouncilOfGovernments
+# Описание: Указывает, является ли организация советом местных органов власти.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – помогает идентифицировать местные или межрегиональные органы власти.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isHousingAuthoritiesPublicOrTribal": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isHousingAuthoritiesPublicOrTribal
+# Описание: Указывает, является ли организация государственным или племенным жилищным органом.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контракта с жилищными властями.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isInterstateEntity": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isInterstateEntity
+# Описание: Указывает, является ли организация межгосударственным органом.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа организаций, работающих между несколькими штатами.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPlanningCommission": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPlanningCommission
+# Описание: Указывает, является ли организация комиссией по планированию.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – помогает понять, работает ли организация в сфере городского или регионального планирования.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPortAuthority": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isPortAuthority
+# Описание: Указывает, является ли организация портовой властью.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа работы с портами и морской логистикой.
+
+"content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isTransitAuthority": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfGovernmentEntity__isTransitAuthority
+# Описание: Указывает, является ли организация транспортной властью.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контракта с транспортными и железнодорожными властями.
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors
+# Описание: Контейнер, содержащий информацию о организационных факторах поставщика.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isSubchapterSCorporation": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isSubchapterSCorporation
+# Описание: Указывает, является ли организация корпорацией по подглаве С (для налоговых целей в США).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для определения налогового статуса компании.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isLimitedLiabilityCorporation": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isLimitedLiabilityCorporation
+# Описание: Указывает, является ли организация ограниченной ответственностью (LLC).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – помогает различить организационные формы компаний.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isForeignOwnedAndLocated": "true"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isForeignOwnedAndLocated
+# Описание: Указывает, является ли организация иностранной, как по собственности, так и по расположению.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с иностранными компаниями.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure": "\n                "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure
+# Описание: Контейнер для информации о структуре прибыли организации.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isForProfitOrganization": "true"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isForProfitOrganization
+# Описание: Указывает, является ли организация коммерческой, целью которой является получение прибыли.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Высокая – важно для анализа коммерческих организаций.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isNonprofitOrganization": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isNonprofitOrganization
+# Описание: Указывает, является ли организация некоммерческой.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с некоммерческими организациями.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isOtherNotForProfitOrganization": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isOtherNotForProfitOrganization
+# Описание: Указывает, является ли организация другой некоммерческой организацией.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Низкая – важно для разнообразных типов некоммерческих организаций.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isShelteredWorkshop": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__isShelteredWorkshop
+# Описание: Указывает, является ли организация защищённым предприятием для инвалидов.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для поддержки контрактов с организациями, поддерживающими инвалидов.
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation": "DE"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation
+# Описание: Указывает штат, в котором зарегистрирована организация.
+# Формат: Строка (String), например, `"DE"`, что означает штат Делавэр.
+# Важность для анализа: Средняя – важно для определения местоположения и юридической юрисдикции компании.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation__name": "DELAWARE"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation__name
+# Описание: Название штата, в котором зарегистрирована организация (в данном случае, Делавэр).
+# Формат: Строка (String), например, `"DELAWARE"`.
+# Важность для анализа: Средняя – полезно для понимания юрисдикции регистрации бизнеса, особенно в контексте юридических требований.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation": "USA"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation
+# Описание: Указывает страну, в которой зарегистрирована организация.
+# Формат: Строка (String), например, `"USA"`, что означает США.
+# Важность для анализа: Высокая – важно для различения местных и иностранных компаний.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation__name": "UNITED STATES"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation__name
+# Описание: Полное название страны, в которой зарегистрирована организация (в данном случае, США).
+# Формат: Строка (String), например, `"UNITED STATES"`.
+# Важность для анализа: Высокая – помогает различать компании, зарегистрированные в США, и за рубежом.
+
+"content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__organizationalType": "PARTNERSHIP"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__organizationalType
+# Описание: Указывает тип организационной формы бизнеса (например, партнёрство).
+# Формат: Строка (String), например, `"PARTNERSHIP"`, что означает партнёрство.
+# Важность для анализа: Средняя – помогает определить юридическую структуру организации.
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity
+# Описание: Контейнер, содержащий информацию о типе образовательной организации.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1862LandGrantCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1862LandGrantCollege
+# Описание: Указывает, является ли организация университетом, основанным по закону 1862 года (Land Grant College).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с учебными заведениями, получившими землю по закону 1862 года.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1890LandGrantCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1890LandGrantCollege
+# Описание: Указывает, является ли организация университетом, основанным по закону 1890 года (Land Grant College).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с университетами, основанными по закону 1890 года.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1994LandGrantCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__is1994LandGrantCollege
+# Описание: Указывает, является ли организация университетом, основанным по закону 1994 года (Land Grant College).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с университетами, основанными по закону 1994 года.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isHistoricallyBlackCollegeOrUniversity": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isHistoricallyBlackCollegeOrUniversity
+# Описание: Указывает, является ли организация исторически черным колледжем или университетом.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с исторически черными колледжами или университетами.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isMinorityInstitution": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isMinorityInstitution
+# Описание: Указывает, является ли организация учебным заведением, обслуживающим меньшинства.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – важно для анализа контрактов с учреждениями, поддерживающими образовательные возможности для меньшинств.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isPrivateUniversityOrCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isPrivateUniversityOrCollege
+# Описание: Указывает, является ли организация частным университетом или колледжем.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – важно для различения частных и государственных образовательных учреждений.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isSchoolOfForestry": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isSchoolOfForestry
+# Описание: Указывает, является ли организация школой лесного хозяйства.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Низкая – полезно для контрактов, связанных с лесным хозяйством.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isStateControlledInstitutionofHigherLearning": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isStateControlledInstitutionofHigherLearning
+# Описание: Указывает, является ли организация государственным учреждением высшего образования.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с государственными университетами.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isTribalCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isTribalCollege
+# Описание: Указывает, является ли организация племенным колледжем.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с племенными образовательными учреждениями.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isVeterinaryCollege": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isVeterinaryCollege
+# Описание: Указывает, является ли организация ветеринарным колледжем.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов, связанных с ветеринарным образованием.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isAlaskanNativeServicingInstitution": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isAlaskanNativeServicingInstitution
+# Описание: Указывает, является ли организация учреждением, обслуживающим коренных жителей Аляски.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов с учреждениями, поддерживающими коренных жителей Аляски.
+
+"content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isNativeHawaiianServicingInstitution": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__typeOfEducationalEntity__isNativeHawaiianServicingInstitution
+# Описание: Указывает, является ли организация учреждением, обслуживающим коренных гавайцев.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для контрактов с учреждениями, поддерживающими коренных гавайцев.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications
+# Описание: Контейнер для информации о сертификациях поставщика.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт информации, но вложенные элементы полезны.
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isDOTCertifiedDisadvantagedBusinessEnterprise": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isDOTCertifiedDisadvantagedBusinessEnterprise
+# Описание: Указывает, сертифицирована ли организация как предприятие с ограниченными возможностями, сертифицированное Министерством транспорта США.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с предприятиями, сертифицированными по программе DOT.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedSmallDisadvantagedBusiness": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedSmallDisadvantagedBusiness
+# Описание: Указывает, является ли организация малым предприятием, самостоятельно сертифицированным как предприятие с ограниченными возможностями.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с малыми предприятиями с ограниченными возможностями.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedSmallDisadvantagedBusiness": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedSmallDisadvantagedBusiness
+# Описание: Указывает, сертифицировано ли малое предприятие как предприятие с ограниченными возможностями по программе SBA.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – важно для анализа контрактов с сертифицированными малыми предприятиями.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AProgramParticipant": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AProgramParticipant
+# Описание: Указывает, является ли организация участником программы SBA 8(a) (для малых предприятий).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с организациями, участвующими в программе 8(a).
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedHUBZoneJointVenture": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSelfCertifiedHUBZoneJointVenture
+# Описание: Указывает, является ли организация совместным предприятием, самостоятельно сертифицированным по программе HUBZone.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа совместных предприятий в рамках программы HUBZone.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedHUBZone": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertifiedHUBZone
+# Описание: Указывает, сертифицирована ли организация в качестве малого бизнеса в зоне разработки HUBZone.
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа контрактов с организациями в рамках программы HUBZone.
+
+"content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AJointVenture": "false"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorCertifications__isSBACertified8AJointVenture
+# Описание: Указывает, является ли организация совместным предприятием, сертифицированным в рамках программы SBA 8(a).
+# Формат: Булево (Boolean), `"true"` или `"false"`.
+# Важность для анализа: Средняя – полезно для анализа совместных предприятий, сертифицированных в рамках SBA 8(a).
+"content__award__vendor__vendorSiteDetails__vendorLocation": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation
+# Описание: Контейнер, содержащий информацию о местоположении поставщика.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__streetAddress": "3737 MARSHALL AVE"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__streetAddress
+# Описание: Улица, на которой расположена организация.
+# Формат: Строка (String), например, `"3737 MARSHALL AVE"`.
+# Важность для анализа: Высокая – полезно для точного определения местоположения поставщика.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__city": "SAINT LOUIS"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__city
+# Описание: Город, в котором расположена организация.
+# Формат: Строка (String), например, `"SAINT LOUIS"`.
+# Важность для анализа: Высокая – полезно для географической идентификации поставщика.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__state": "MO"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__state
+# Описание: Код штата, в котором расположена организация.
+# Формат: Строка (String), например, `"MO"`, что означает штат Миссури.
+# Важность для анализа: Высокая – полезно для определения местоположения в рамках США.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__state__name": "MISSOURI"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__state__name
+# Описание: Полное название штата, в котором расположена организация.
+# Формат: Строка (String), например, `"MISSOURI"`.
+# Важность для анализа: Высокая – полезно для полной идентификации местоположения.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode": "63119"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode
+# Описание: Почтовый индекс местоположения организации.
+# Формат: Строка (String), например, `"63119"`.
+# Важность для анализа: Средняя – полезно для точной географической локализации.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode__city": "SAINT LOUIS"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode__city
+# Описание: Город, соответствующий почтовому индексу.
+# Формат: Строка (String), например, `"SAINT LOUIS"`.
+# Важность для анализа: Средняя – полезно для подтверждения города, связанного с почтовым индексом.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__countryCode": "USA"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__countryCode
+# Описание: Код страны, в которой расположена организация.
+# Формат: Строка (String), например, `"USA"`, что означает США.
+# Важность для анализа: Высокая – важно для международной идентификации поставщика.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__countryCode__name": "UNITED STATES"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__countryCode__name
+# Описание: Полное название страны, в которой расположена организация.
+# Формат: Строка (String), например, `"UNITED STATES"`.
+# Важность для анализа: Высокая – полезно для подтверждения страны происхождения.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__phoneNo": "9204618790"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__phoneNo
+# Описание: Номер телефона организации.
+# Формат: Строка (String), например, `"9204618790"`.
+# Важность для анализа: Средняя – полезно для связи с поставщиком.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__congressionalDistrictCode": "02"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__congressionalDistrictCode
+# Описание: Код конгрессного округа, в котором расположена организация.
+# Формат: Строка (String), например, `"02"`.
+# Важность для анализа: Средняя – полезно для анализа, в каком округе находится организация для политической или налоговой идентификации.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__entityDataSource": "D&B"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__entityDataSource
+# Описание: Источник данных об организации (например, Dun & Bradstreet).
+# Формат: Строка (String), например, `"D&B"`.
+# Важность для анализа: Низкая – полезно для проверки достоверности данных о поставщике.
+
+"content__award__vendor__vendorSiteDetails__vendorLocation__vendorAlternateSiteCode": "63119"
+# Переменная: content__award__vendor__vendorSiteDetails__vendorLocation__vendorAlternateSiteCode
+# Описание: Альтернативный код местоположения, связанный с организацией.
+# Формат: Строка (String), например, `"63119"`.
+# Важность для анализа: Низкая – может быть полезно для уточнения местоположения или идентификации альтернативных адресов.
+"content__award__vendor__vendorSiteDetails__entityIdentifiers": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers
+# Описание: Контейнер для информации, связанной с идентификаторами организации.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation": "\n                "
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation
+# Описание: Контейнер для информации о Unique Entity Identifier (UEI) организации.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Высокая – полезно для уникальной идентификации поставщика.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI": "QGUQWSU5AHB4"
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI
+# Описание: Уникальный идентификатор организации (UEI), используемый для официальной идентификации.
+# Формат: Строка (String), например, `"QGUQWSU5AHB4"`.
+# Важность для анализа: Высокая – важно для точной идентификации юридического лица в государственных контрактах.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEILegalBusinessName": "PERIMETER SOLUTIONS LP"
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEILegalBusinessName
+# Описание: Юридическое название организации, соответствующее её Unique Entity Identifier.
+# Формат: Строка (String), например, `"PERIMETER SOLUTIONS LP"`.
+# Важность для анализа: Высокая – полезно для подтверждения легальности и правильности наименования организации.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEI": "LBLLJKAVKL68"
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEI
+# Описание: UEI основного (родительского) бизнеса или организации, которая является владельцем или управляющим.
+# Формат: Строка (String), например, `"LBLLJKAVKL68"`.
+# Важность для анализа: Средняя – полезно для понимания структуры владения и управления.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEIName": "PERIMETER SOLUTIONS LP"
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEIName
+# Описание: Название организации, являющейся владельцем или управляющим организацией (родитель).
+# Формат: Строка (String), например, `"PERIMETER SOLUTIONS LP"`.
+# Важность для анализа: Средняя – помогает понять, кто является владельцем или управляющим организацией.
+
+"content__award__vendor__vendorSiteDetails__entityIdentifiers__cageCode": "1RKV8"
+# Переменная: content__award__vendor__vendorSiteDetails__entityIdentifiers__cageCode
+# Описание: CAGE (Commercial and Government Entity) код, присвоенный организации для государственных контрактов.
+# Формат: Строка (String), например, `"1RKV8"`.
+# Важность для анализа: Высокая – важно для точной идентификации организации в контрактных и государственных документах.
+"content__award__vendor__vendorSiteDetails__ccrRegistrationDetails": "\n              "
+# Переменная: content__award__vendor__vendorSiteDetails__ccrRegistrationDetails
+# Описание: Контейнер для данных о регистрации организации в CCR (Central Contractor Registration).
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт информации само по себе, но вложенные элементы полезны.
+
+"content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__registrationDate": "2000-09-16 00:00:00"
+# Переменная: content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__registrationDate
+# Описание: Дата регистрации организации в CCR.
+# Формат: Дата и время (DateTime), например, `"2000-09-16 00:00:00"`.
+# Важность для анализа: Средняя – полезно для понимания того, как долго организация зарегистрирована в системе.
+
+"content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__renewalDate": "2019-05-24 00:00:00"
+# Переменная: content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__renewalDate
+# Описание: Дата продления регистрации организации в CCR.
+# Формат: Дата и время (DateTime), например, `"2019-05-24 00:00:00"`.
+# Важность для анализа: Средняя – помогает понять актуальность регистрации организации в CCR.
+
+"content__award__vendor__contractingOfficerBusinessSizeDetermination": "O"
+# Переменная: content__award__vendor__contractingOfficerBusinessSizeDetermination
+# Описание: Оценка размера бизнеса, произведённая контрактующим офицером.
+# Формат: Строка (String), например, `"O"`, что может означать "Other Than Small Business" (Не малый бизнес).
+# Важность для анализа: Высокая – полезно для понимания размера бизнеса и его классификации.
+
+"content__award__vendor__contractingOfficerBusinessSizeDetermination__description": "OTHER THAN SMALL BUSINESS"
+# Переменная: content__award__vendor__contractingOfficerBusinessSizeDetermination__description
+# Описание: Описание оценки размера бизнеса, произведённой контрактующим офицером.
+# Формат: Строка (String), например, `"OTHER THAN SMALL BUSINESS"`.
+# Важность для анализа: Высокая – важно для определения статуса бизнеса в контексте государственных контрактов.
+"content__award__placeOfPerformance": "\n          "
+# Переменная: content__award__placeOfPerformance
+# Описание: Контейнер для информации о месте исполнения контракта.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт информации само по себе, но вложенные элементы полезны.
+
+"content__award__placeOfPerformance__principalPlaceOfPerformance": "\n            "
+# Переменная: content__award__placeOfPerformance__principalPlaceOfPerformance
+# Описание: Контейнер для основного места исполнения контракта.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт данных само по себе, но вложенные элементы полезны.
+
+"content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode": "ID"
+# Переменная: content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode
+# Описание: Код штата, в котором выполняется контракт.
+# Формат: Строка (String), например, `"ID"`, что означает штат Айдахо.
+# Важность для анализа: Высокая – важно для точной географической локализации исполнения контракта.
+
+"content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode__name": "IDAHO"
+# Переменная: content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode__name
+# Описание: Название штата, в котором выполняется контракт.
+# Формат: Строка (String), например, `"IDAHO"`.
+# Важность для анализа: Высокая – полезно для полной идентификации местоположения контракта.
+
+"content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode": "USA"
+# Переменная: content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode
+# Описание: Код страны, в которой выполняется контракт.
+# Формат: Строка (String), например, `"USA"`, что означает США.
+# Важность для анализа: Высокая – важно для понимания, в какой стране исполняется контракт.
+
+"content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode__name": "UNITED STATES"
+# Переменная: content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode__name
+# Описание: Полное название страны, в которой выполняется контракт.
+# Формат: Строка (String), например, `"UNITED STATES"`.
+# Важность для анализа: Высокая – помогает в точной идентификации страны исполнения контракта.
+
+"content__award__placeOfPerformance__placeOfPerformanceZIPCode": "837055354"
+# Переменная: content__award__placeOfPerformance__placeOfPerformanceZIPCode
+# Описание: Почтовый индекс места исполнения контракта.
+# Формат: Строка (String), например, `"837055354"`.
+# Важность для анализа: Средняя – полезно для точной географической локализации контракта.
+
+"content__award__placeOfPerformance__placeOfPerformanceZIPCode__county": "ADA"
+# Переменная: content__award__placeOfPerformance__placeOfPerformanceZIPCode__county
+# Описание: Округ, соответствующий почтовому индексу места исполнения контракта.
+# Формат: Строка (String), например, `"ADA"`.
+# Важность для анализа: Средняя – полезно для уточнения географического местоположения.
+
+"content__award__placeOfPerformance__placeOfPerformanceZIPCode__city": "BOISE"
+# Переменная: content__award__placeOfPerformance__placeOfPerformanceZIPCode__city
+# Описание: Город, соответствующий почтовому индексу места исполнения контракта.
+# Формат: Строка (String), например, `"BOISE"`.
+# Важность для анализа: Средняя – полезно для точного определения города исполнения контракта.
+
+"content__award__placeOfPerformance__placeOfPerformanceCongressionalDistrict": "01"
+# Переменная: content__award__placeOfPerformance__placeOfPerformanceCongressionalDistrict
+# Описание: Код конгрессного округа, в котором исполняется контракт.
+# Формат: Строка (String), например, `"01"`.
+# Важность для анализа: Средняя – полезно для определения политического округа, что может быть важно для анализа государственной деятельности.
+"content__award__competition": "\n          "
+# Переменная: content__award__competition
+# Описание: Контейнер для информации о конкуренции по контракту.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__competition__extentCompeted": "C"
+# Переменная: content__award__competition__extentCompeted
+# Описание: Уровень конкуренции по контракту.
+# Формат: Строка (String), например, `"C"`, что может означать "NOT COMPETED" (не было конкуренции).
+# Важность для анализа: Высокая – помогает понять, была ли конкуренция на контракт или он был предоставлен без конкуренции.
+
+"content__award__competition__extentCompeted__description": "NOT COMPETED"
+# Переменная: content__award__competition__extentCompeted__description
+# Описание: Описание уровня конкуренции.
+# Формат: Строка (String), например, `"NOT COMPETED"`.
+# Важность для анализа: Высокая – важно для понимания, был ли контракт конкурентным или не было других предложений.
+
+"content__award__competition__solicitationProcedures": "SSS"
+# Переменная: content__award__competition__solicitationProcedures
+# Описание: Процедура подачи предложений для контракта.
+# Формат: Строка (String), например, `"SSS"`, что может означать "ONLY ONE SOURCE" (только один источник).
+# Важность для анализа: Высокая – помогает определить, использовалась ли процедура запросов предложений для контракта.
+
+"content__award__competition__solicitationProcedures__description": "ONLY ONE SOURCE"
+# Переменная: content__award__competition__solicitationProcedures__description
+# Описание: Описание процедуры подачи предложений.
+# Формат: Строка (String), например, `"ONLY ONE SOURCE"`.
+# Важность для анализа: Высокая – важно для понимания, был ли контракт ограничен одним источником.
+
+"content__award__competition__idvTypeOfSetAside": "NONE"
+# Переменная: content__award__competition__idvTypeOfSetAside
+# Описание: Указывает, был ли применён тип выделенного контракта для малых или других компаний.
+# Формат: Строка (String), например, `"NONE"`, что означает отсутствие выделения.
+# Важность для анализа: Средняя – полезно для понимания, были ли какие-либо выделения для определённых типов организаций.
+
+"content__award__competition__idvTypeOfSetAside__description": "NO SET ASIDE USED."
+# Переменная: content__award__competition__idvTypeOfSetAside__description
+# Описание: Описание того, использовался ли тип выделенного контракта.
+# Формат: Строка (String), например, `"NO SET ASIDE USED."`.
+# Важность для анализа: Средняя – полезно для понимания, было ли исключение для определённой категории бизнеса.
+
+"content__award__competition__typeOfSetAsideSource": "B"
+# Переменная: content__award__competition__typeOfSetAsideSource
+# Описание: Источник для выделения контракта.
+# Формат: Строка (String), например, `"B"`, что может означать "IDC" (Indefinite Delivery Contract – бессрочный контракт).
+# Важность для анализа: Средняя – полезно для анализа источников выделений контрактов.
+
+"content__award__competition__typeOfSetAsideSource__description": "IDC"
+# Переменная: content__award__competition__typeOfSetAsideSource__description
+# Описание: Описание источника для выделения контракта.
+# Формат: Строка (String), например, `"IDC"`, что означает бессрочный контракт.
+# Важность для анализа: Средняя – полезно для понимания, на какой основе был выделен контракт.
+
+"content__award__competition__evaluatedPreference": "NONE"
+# Переменная: content__award__competition__evaluatedPreference
+# Описание: Указывает, был ли использован предпочтительный анализ при оценке предложений.
+# Формат: Строка (String), например, `"NONE"`, что означает отсутствие предпочтений.
+# Важность для анализа: Средняя – полезно для анализа, использовались ли какие-либо предпочтения при оценке контрактов.
+
+"content__award__competition__evaluatedPreference__description": "NO PREFERENCE USED"
+# Переменная: content__award__competition__evaluatedPreference__description
+# Описание: Описание предпочтений, если таковые были.
+# Формат: Строка (String), например, `"NO PREFERENCE USED"`.
+# Важность для анализа: Средняя – важно для понимания, был ли контракт оценён без предпочтений или с ними.
+
+"content__award__competition__reasonNotCompeted": "ONE"
+# Переменная: content__award__competition__reasonNotCompeted
+# Описание: Причина, по которой контракт не был конкурентным.
+# Формат: Строка (String), например, `"ONE"`, что может означать, что был только один участник.
+# Важность для анализа: Высокая – важно для анализа, почему не было конкуренции и почему контракт был предоставлен без конкурентных предложений.
+"content__award__competition__reasonNotCompeted__description": "ONLY ONE SOURCE-OTHER (FAR 6.302-1 OTHER)"
+# Переменная: content__award__competition__reasonNotCompeted__description
+# Описание: Причина, по которой контракт не был конкурентным, указано "только один источник".
+# Формат: Строка (String), например, `"ONLY ONE SOURCE-OTHER (FAR 6.302-1 OTHER)"`.
+# Важность для анализа: Высокая – важная информация для понимания причин отсутствия конкуренции и применения специальной исключительной процедуры.
+
+"content__award__competition__idvNumberOfOffersReceived": "1"
+# Переменная: content__award__competition__idvNumberOfOffersReceived
+# Описание: Количество предложений, полученных для контракта.
+# Формат: Число (Integer), например, `1`.
+# Важность для анализа: Высокая – полезно для анализа уровня конкуренции и активности на рынке.
+
+"content__award__competition__numberOfOffersSource": "B"
+# Переменная: content__award__competition__numberOfOffersSource
+# Описание: Источник предложений для контракта.
+# Формат: Строка (String), например, `"B"`, что может означать "IDC" (Indefinite Delivery Contract – бессрочный контракт).
+# Важность для анализа: Средняя – полезно для понимания, какой тип контракта был использован и сколько предложений было подано.
+
+"content__award__competition__numberOfOffersSource__description": "IDC"
+# Переменная: content__award__competition__numberOfOffersSource__description
+# Описание: Описание источника предложений.
+# Формат: Строка (String), например, `"IDC"`, что означает бессрочный контракт.
+# Важность для анализа: Средняя – помогает понять, как был организован запрос предложений.
+
+"content__award__competition__commercialItemAcquisitionProcedures": "A"
+# Переменная: content__award__competition__commercialItemAcquisitionProcedures
+# Описание: Указывает, использовалась ли процедура для приобретения коммерческих товаров и услуг.
+# Формат: Строка (String), например, `"A"`, что может означать приобретение коммерческих товаров/услуг.
+# Важность для анализа: Средняя – полезно для понимания типа контракта и того, как были приобретены товары или услуги.
+
+"content__award__competition__commercialItemAcquisitionProcedures__description": "COMMERCIAL PRODUCTS/SERVICES"
+# Переменная: content__award__competition__commercialItemAcquisitionProcedures__description
+# Описание: Описание процедуры для приобретения коммерческих товаров и услуг.
+# Формат: Строка (String), например, `"COMMERCIAL PRODUCTS/SERVICES"`.
+# Важность для анализа: Средняя – помогает понять, что контракт связан с покупкой коммерческих товаров и услуг.
+
+"content__award__competition__commercialItemTestProgram": "N"
+# Переменная: content__award__competition__commercialItemTestProgram
+# Описание: Указывает, использовалась ли программа тестирования коммерческих товаров.
+# Формат: Булево (Boolean), `"true"` или `"false"`, например, `"N"`, что означает "нет".
+# Важность для анализа: Низкая – полезно для определения, использовалась ли программа тестирования коммерческих товаров.
+
+"content__award__competition__commercialItemTestProgram__description": "NO"
+# Переменная: content__award__competition__commercialItemTestProgram__description
+# Описание: Описание того, использовалась ли программа тестирования коммерческих товаров.
+# Формат: Строка (String), например, `"NO"`, что означает "не использовалась".
+# Важность для анализа: Низкая – помогает уточнить, была ли использована программа для тестирования товаров.
+"content__award__competition__A76Action": "N"
+# Переменная: content__award__competition__A76Action
+# Описание: Указывает, был ли применён A-76 процесс для определения того, должны ли государственные учреждения выполнять работу или это можно передать частным подрядчикам.
+# Формат: Булево (Boolean), `"true"` или `"false"`, например, `"N"`, что означает "не применялось".
+# Важность для анализа: Средняя – полезно для понимания, использовалась ли государственная программа для определения, следует ли передавать контракт частным компаниям.
+
+"content__award__competition__A76Action__description": "NO"
+# Переменная: content__award__competition__A76Action__description
+# Описание: Описание того, использовался ли процесс A-76 для контракта.
+# Формат: Строка (String), например, `"NO"`, что означает "не использовался".
+# Важность для анализа: Средняя – помогает уточнить, применялись ли процедуры, связанные с программой A-76.
+
+"content__award__competition__fedBizOpps": "Y"
+# Переменная: content__award__competition__fedBizOpps
+# Описание: Указывает, были ли сделаны публичные объявления о федеральных бизнес-возможностях (Federal Business Opportunities).
+# Формат: Булево (Boolean), `"true"` или `"false"`, например, `"Y"`, что означает "да".
+# Важность для анализа: Высокая – полезно для анализа доступности контракта для широкого круга поставщиков и прозрачности процесса.
+
+"content__award__competition__fedBizOpps__description": "YES"
+# Переменная: content__award__competition__fedBizOpps__description
+# Описание: Описание того, были ли сделаны объявления о федеральных бизнес-возможностях.
+# Формат: Строка (String), например, `"YES"`, что означает "да".
+# Важность для анализа: Высокая – важно для подтверждения, что информация о контракте была доступна публично.
+
+"content__award__competition__localAreaSetAside": "N"
+# Переменная: content__award__competition__localAreaSetAside
+# Описание: Указывает, был ли применён локальный набор контрактов (например, для местных или малых предприятий).
+# Формат: Булево (Boolean), `"true"` или `"false"`, например, `"N"`, что означает "не применялось".
+# Важность для анализа: Средняя – полезно для понимания, был ли контракт ограничен для местных предприятий или поставщиков.
+
+"content__award__competition__localAreaSetAside__description": "NO"
+# Переменная: content__award__competition__localAreaSetAside__description
+# Описание: Описание того, был ли использован локальный набор для контракта.
+# Формат: Строка (String), например, `"NO"`, что означает "не применялось".
+# Важность для анализа: Средняя – помогает уточнить, было ли географическое ограничение для получения контракта.
+"content__award__preferencePrograms": "\n          "
+# Переменная: content__award__preferencePrograms
+# Описание: Контейнер для информации о предпочтительных программах, которые применяются к контракту.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__preferencePrograms__subcontractPlan": "G"
+# Переменная: content__award__preferencePrograms__subcontractPlan
+# Описание: Указывает, используется ли программа для субподрядов, и если используется, то какой тип.
+# Формат: Строка (String), например, `"G"`, что может означать "COMMERCIAL SUBCONTRACT PLAN".
+# Важность для анализа: Средняя – важно для понимания, применяется ли коммерческий план для субподрядов в контракте.
+
+"content__award__preferencePrograms__subcontractPlan__description": "COMMERCIAL SUBCONTRACT PLAN"
+# Переменная: content__award__preferencePrograms__subcontractPlan__description
+# Описание: Описание того, что это за план субподряда.
+# Формат: Строка (String), например, `"COMMERCIAL SUBCONTRACT PLAN"`.
+# Важность для анализа: Средняя – помогает понять, используется ли коммерческий план для субподряда в рамках контракта.
+"content__award__transactionInformation": "\n          "
+# Переменная: content__award__transactionInformation
+# Описание: Контейнер для информации о транзакции контракта.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__transactionInformation__createdBy": "LARRYROBILLARD@FS.FED.US"
+# Переменная: content__award__transactionInformation__createdBy
+# Описание: Электронная почта пользователя, создавшего транзакцию.
+# Формат: Строка (String), например, `"LARRYROBILLARD@FS.FED.US"`.
+# Важность для анализа: Средняя – полезно для отслеживания, кто инициировал транзакцию.
+
+"content__award__transactionInformation__createdDate": "2023-02-07 14:27:43"
+# Переменная: content__award__transactionInformation__createdDate
+# Описание: Дата и время создания транзакции.
+# Формат: Дата и время (DateTime), например, `"2023-02-07 14:27:43"`.
+# Важность для анализа: Средняя – полезно для отслеживания, когда была создана транзакция.
+
+"content__award__transactionInformation__lastModifiedBy": "LARRYROBILLARD@FS.FED.US"
+# Переменная: content__award__transactionInformation__lastModifiedBy
+# Описание: Электронная почта пользователя, последний раз изменившего транзакцию.
+# Формат: Строка (String), например, `"LARRYROBILLARD@FS.FED.US"`.
+# Важность для анализа: Средняя – полезно для отслеживания, кто и когда изменял данные транзакции.
+
+"content__award__transactionInformation__lastModifiedDate": "2023-02-07 15:12:28"
+# Переменная: content__award__transactionInformation__lastModifiedDate
+# Описание: Дата и время последнего изменения транзакции.
+# Формат: Дата и время (DateTime), например, `"2023-02-07 15:12:28"`.
+# Важность для анализа: Средняя – полезно для отслеживания, когда произошли изменения в транзакции.
+
+"content__award__transactionInformation__status": "F"
+# Переменная: content__award__transactionInformation__status
+# Описание: Статус транзакции.
+# Формат: Строка (String), например, `"F"`, что может означать "FINAL".
+# Важность для анализа: Высокая – важно для понимания текущего состояния транзакции (например, завершена или ожидает).
+
+"content__award__transactionInformation__status__description": "FINAL"
+# Переменная: content__award__transactionInformation__status__description
+# Описание: Описание статуса транзакции.
+# Формат: Строка (String), например, `"FINAL"`, что означает завершение транзакции.
+# Важность для анализа: Высокая – важно для понимания, является ли транзакция окончательной.
+
+"content__award__transactionInformation__approvedBy": "LARRYROBILLARD@FS.FED.US"
+# Переменная: content__award__transactionInformation__approvedBy
+# Описание: Электронная почта пользователя, утвердившего транзакцию.
+# Формат: Строка (String), например, `"LARRYROBILLARD@FS.FED.US"`.
+# Важность для анализа: Средняя – полезно для отслеживания, кто утвердил транзакцию.
+
+"content__award__transactionInformation__approvedDate": "2023-02-07 15:12:28"
+# Переменная: content__award__transactionInformation__approvedDate
+# Описание: Дата и время утверждения транзакции.
+# Формат: Дата и время (DateTime), например, `"2023-02-07 15:12:28"`.
+# Важность для анализа: Средняя – полезно для отслеживания, когда была утверждена транзакция.
+
+"content__award__transactionInformation__closedStatus": "N"
+# Переменная: content__award__transactionInformation__closedStatus
+# Описание: Указывает, закрыта ли транзакция.
+# Формат: Булево (Boolean), например, `"N"`, что означает "не закрыта".
+# Важность для анализа: Средняя – полезно для анализа, завершена ли транзакция или нет.
+"content__award__genericTags": "\n          "
+# Переменная: content__award__genericTags
+# Описание: Контейнер для общих тегов, которые могут быть применены к контракту.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – само поле не несёт данных, но вложенные элементы полезны.
+
+"content__award__genericTags__genericStrings": "\n            "
+# Переменная: content__award__genericTags__genericStrings
+# Описание: Контейнер для общего списка строк, применённых к контракту.
+# Формат: Строка (String), обычно XML-структура или пустая строка.
+# Важность для анализа: Низкая – не несёт информации само по себе, но вложенные элементы полезны.
+
+"content__award__genericTags__genericStrings__genericString01": "2022-12-29 00:00:00"
+# Переменная: content__award__genericTags__genericStrings__genericString01
+# Описание: Дата, связанная с контрактом.
+# Формат: Дата и время (DateTime), например, `"2022-12-29 00:00:00"`.
+# Важность для анализа: Средняя – полезно для отслеживания временных рамок, связанных с контрактом.
+
+"content__award__genericTags__genericStrings__genericString02": "QGUQWSU5AHB4"
+# Переменная: content__award__genericTags__genericStrings__genericString02
+# Описание: Уникальный идентификатор (например, UEI) организации или контракта.
+# Формат: Строка (String), например, `"QGUQWSU5AHB4"`.
+# Важность для анализа: Высокая – важно для точной идентификации организации или контракта.
