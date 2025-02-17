@@ -5,8 +5,8 @@ https://www.fpds.gov/ezsearch/FEEDS/ATOM?s=FPDS&FEEDNAME=PUBLIC&q=SIGNED_DATE:[2
 	• SIGNED_DATE:[2023/01/01,2023/01/01] – filter by signing date.
 	• Returns ATOM XML with information about found contracts.
 
-https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&q=PIID:19BE2023A0029
-
+https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&q=PIID:19BE2023A0029 // 
+https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&q=PIID:N666041890001 // OTHERTRANSACTIONAWARD
 
 	• PIID:19BE2023A0029 – filter by unique contract identifier.
 	• Returns ATOM XML with detailed information on this contract.

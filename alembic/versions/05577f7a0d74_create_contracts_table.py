@@ -21,6 +21,7 @@ def upgrade():
     op.create_table(
         'contracts',
         sa.Column('id', sa.BigInteger, primary_key=True, autoincrement=True, comment="Primary key"),
+        sa.Column('contract_type', sa.String(255), nullable=True, index=True, comment="The type of contract (e.g., IDV, AWARD, OTHERTRANSACTIONAWARD)"),
         sa.Column('piid', sa.String(255), nullable=True, comment="The Procurement Instrument Identifier (PIID)"),
         sa.Column('idv_piid', sa.String(255), nullable=True, comment="The PIID of the IDV contract if applicable"),
         sa.Column('referenced_piid', sa.String(255), nullable=True, index=True, comment="The PIID for the referenced award or contract"),

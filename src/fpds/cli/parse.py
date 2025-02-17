@@ -94,9 +94,7 @@ def save_contracts_to_db(parsed_date, file_path):
             piid = contract.get("content__award__awardID__awardContractID__PIID") or \
                    contract.get("content__IDV__contractID__IDVID__PIID")
 
-            if not piid:
-                click.echo("🚫 Contract without PIID and IDV_PIID skipped!")
-                continue  # Skip contracts without identifier
+
             
             # Get the modification number
             mod_number = contract.get("content__award__awardID__awardContractID__modNumber")
@@ -126,16 +124,9 @@ def save_contracts_to_db(parsed_date, file_path):
 
                 continue  # Move to the next contract
 
-            # Determine the type of contract
-            if "content__IDV" in contract:
-                contract_type = "IDV"
-            elif "content__award" in contract:
-                contract_type = "AWARD"
-            else:
-                contract_type = "UNKNOWN"
-
             # Fill in the fields depending on the type of contract
-            if contract_type == "IDV":
+            if contract.get("contract_type") == "IDV":
+                contract_type = contract.get("contract_type", None)
                 piid = contract.get("content__award__awardID__awardContractID__PIID", None)
                 idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
                 referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
@@ -157,7 +148,8 @@ def save_contracts_to_db(parsed_date, file_path):
                 number_of_offers_received = int(contract.get("content__IDV__competition__numberOfOffersReceived", 0) or 0)
                 extent_competed = contract.get("content__IDV__competition__extentCompeted", None)
 
-            elif contract_type == "AWARD":
+            elif contract.get("contract_type") == "AWARD":
+                contract_type = contract.get("contract_type", None)
                 piid = contract.get("content__award__awardID__awardContractID__PIID", None)
                 idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
                 referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
@@ -178,18 +170,66 @@ def save_contracts_to_db(parsed_date, file_path):
                 funding_requesting_office_id = contract.get("content__award__purchaserInformation__fundingRequestingOfficeID", None)
                 number_of_offers_received = int(contract.get("content__award__competition__numberOfOffersReceived", 0) or 0)
                 extent_competed = contract.get("content__award__competition__extentCompeted", None)
+            
+            elif contract.get("contract_type") == "OTHERTRANSACTIONAWARD":
+                contract_type = contract.get("contract_type", None)
+                piid = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__OtherTransactionAwardContractID__PIID", None)
+                idv_piid = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__referencedIDVID__PIID", None)
+                referenced_piid = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__referencedIDVID__PIID", None)
+                mod_number = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__OtherTransactionAwardContractID__modNumber", None)
+                transaction_number = None  # do not have it
+                signed_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate", None)
+                effective_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__effectiveDate", None)
+                current_completion_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__currentCompletionDate", None)
+                obligated_amount = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__obligatedAmount", 0) or 0)
+                base_and_exercised_options_value = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__baseAndExercisedOptionsValue", 0) or 0)
+                base_and_all_options_value = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__baseAndAllOptionsValue", 0) or 0)
+                vendor_uei = contract.get("content__OtherTransactionAward__contractDetail__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI", None)
+                naics_code = None  # do not have it
+                psc_code = contract.get("content__OtherTransactionAward__contractDetail__PSCCode", None)
+                contracting_office_agency_id = contract.get("content__OtherTransactionAward__contractDetail__purchaserInformation__contractingOfficeAgencyID", None)
+                contracting_office_id = contract.get("content__OtherTransactionAward__contractDetail__purchaserInformation__contractingOfficeID", None)
+                funding_requesting_agency_id = contract.get("content__OtherTransactionAward__contractDetail__purchaserInformation__fundingRequestingAgencyID", None)
+                funding_requesting_office_id = contract.get("content__OtherTransactionAward__contractDetail__purchaserInformation__fundingRequestingOfficeID", None)
+                number_of_offers_received = None # do not have it
+                extent_competed = contract.get("content__OtherTransactionAward__contractDetail__competition__extentCompeted", None)
 
+            elif contract.get("contract_type") == "OTHERTRANSACTIONIDV":
+                contract_type = contract.get("contract_type", None)
+                piid = contract.get("content__OtherTransactionIDV__OtherTransactionIDVID__OtherTransactionIDVContractID__PIID", None)
+                idv_piid = contract.get("content__OtherTransactionIDV__OtherTransactionIDVID__OtherTransactionIDVContractID__PIID", None)
+                referenced_piid = None  # do not have it
+                mod_number = contract.get("content__OtherTransactionIDV__OtherTransactionIDVID__OtherTransactionIDVContractID__modNumber", None)
+                transaction_number = None  # do not have it
+                signed_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate", None)
+                effective_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__effectiveDate", None)
+                current_completion_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__currentCompletionDate", None)
+                obligated_amount = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__obligatedAmount", 0) or 0)
+                base_and_exercised_options_value = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__baseAndExercisedOptionsValue", 0) or 0)
+                base_and_all_options_value = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__baseAndAllOptionsValue", 0) or 0)
+                vendor_uei = contract.get("content__OtherTransactionIDV__contractDetail__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI", None)
+                naics_code = None  # do not have it
+                psc_code = contract.get("content__OtherTransactionIDV__contractDetail__PSCCode", None)
+                contracting_office_agency_id = contract.get("content__OtherTransactionIDV__contractDetail__purchaserInformation__contractingOfficeAgencyID", None)
+                contracting_office_id = contract.get("content__OtherTransactionIDV__contractDetail__purchaserInformation__contractingOfficeID", None)
+                funding_requesting_agency_id = contract.get("content__OtherTransactionIDV__contractDetail__purchaserInformation__fundingRequestingAgencyID", None)
+                funding_requesting_office_id = contract.get("content__OtherTransactionIDV__contractDetail__purchaserInformation__fundingRequestingOfficeID", None)
+                number_of_offers_received = None  # do not have it
+                extent_competed = contract.get("content__OtherTransactionIDV__contractDetail__competition__extentCompeted", None)
+                
             else:
+                # Form a file name in the format errors_year_month_day.log
+                error_log_path = f"errors_{datetime.now().strftime('%Y_%m_%d')}.log"
                 error_message = f"{datetime.now().isoformat()} - ⚠️ Unknown contract type: {json.dumps(contract, indent=2, ensure_ascii=False)}\n"
-
-                # Write the error to the log file
+                 # Write the error to the log file
                 with open(error_log_path, "a", encoding="utf-8") as error_log:
                     error_log.write(error_message)
-                return
+
+                continue
 
             # Preparing data for insertion into the DB
             contract_data = (
-                piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
+                contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                 effective_date, current_completion_date, obligated_amount, 
                 base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
                 naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
@@ -201,7 +241,7 @@ def save_contracts_to_db(parsed_date, file_path):
             try:
                 cursor.executemany("""
                     INSERT INTO contracts (
-                        piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
+                        contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                         effective_date, current_completion_date, obligated_amount, 
                         base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
                         naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
@@ -210,7 +250,7 @@ def save_contracts_to_db(parsed_date, file_path):
                     ) VALUES (
                         %s, %s, %s, %s, %s, 
                         %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, 
+                        %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
                 """ , [contract_data])
@@ -219,7 +259,7 @@ def save_contracts_to_db(parsed_date, file_path):
                 click.echo(f"⚠️ Duplicate PIID in DB {piid} found! Forcedly adding a new record.")
                 cursor.executemany("""
                     INSERT INTO contracts (
-                        piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
+                        contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
                         effective_date, current_completion_date, obligated_amount, 
                         base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
                         naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
@@ -228,7 +268,7 @@ def save_contracts_to_db(parsed_date, file_path):
                     ) VALUES (
                         %s, %s, %s, %s, %s, 
                         %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, 
+                        %s, %s, %s, %s, %s, %s
                         %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
                 """ , [contract_data])
