@@ -125,16 +125,145 @@ def save_contracts_to_db(parsed_date, file_path):
                 continue  # Move to the next contract
 
             # Fill in the fields depending on the type of contract
-            if contract.get("contract_type") == "IDV":
+            if contract.get("contract_type") == "AWARD":
+                # Тип контракта (например, AWARD, IDV, OTHERTRANSACTIONAWARD, OTHERTRANSACTIONIDV).
+                contract_type = contract.get("contract_type", None)
+                # Дата и время последнего изменения данных о контракте.
+                modified = contract.get("modified", None)
+                # Код агентства, заключившего контракт.
+                agency_id = contract.get("content__award__awardID__awardContractID__agencyID", None)
+                # Уникальный идентификатор контракта (Procurement Instrument Identifier, PIID).
+                piid = contract.get("content__award__awardID__awardContractID__PIID", None)
+                # Номер модификации контракта.
+                mod_number = contract.get("content__award__awardID__awardContractID__modNumber", None)
+                # IDV
+                idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
+                # PIID для родительского контракта
+                referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
+                # Дата подписания контракта.
+                signed_date = contract.get("content__award__relevantContractDates__signedDate", None)
+                # Дата вступления контракта в силу.
+                effective_date = contract.get("content__award__relevantContractDates__effectiveDate", None)
+                # Окончательная дата завершения контракта, учитывая все возможные продления.
+                ultimate_completion_date = contract.get("content__award__relevantContractDates__ultimateCompletionDate", None)
+                # Сумма, фактически выделенная по контракту (обязательства по оплате).
+                obligated_amount = float(contract.get("content__award__dollarValues__obligatedAmount", 0) or 0)
+                # Полная стоимость контракта, включая все возможные опции (даже если они ещё не активированы).
+                base_and_all_options_value = float(contract.get("content__award__dollarValues__baseAndAllOptionsValue", 0) or 0)
+                # Общая сумма, выделенная по контракту (включает все модификации и изменения).
+                total_obligated_amount = float(contract.get("content__award__totalDollarValues__totalObligatedAmount", 0) or 0)
+                # Полная стоимость контракта, включая базовую сумму и все возможные опции (даже если они не активированы).
+                total_base_and_all_options_value = float(contract.get("content__award__totalDollarValues__totalBaseAndAllOptionsValue", 0) or 0)
+                # Код агентства, заключившего контракт.
+                contracting_office_agency_id = contract.get("content__award__purchaserInformation__contractingOfficeAgencyID", None)
+                # Код контрактного офиса, который оформил контракт.
+                contracting_office_id = contract.get("content__award__purchaserInformation__contractingOfficeID", None)
+                # Код агентства, запрашивающего финансирование для контракта.
+                funding_requesting_agency_id = contract.get("content__award__purchaserInformation__fundingRequestingAgencyID", None)
+                # Код офиса, запрашивающего финансирование для контракта.
+                funding_requesting_office_id = contract.get("content__award__purchaserInformation__fundingRequestingOfficeID", None)
+                # Описание типа действия по контракту.
+                contract_action_type_description = contract.get("content__award__contractData__contractActionType__description", None)
+                # Тип ценообразования.
+                type_of_contract_pricing_description = contract.get("content__award__contractData__typeOfContractPricing__description", None)
+                # Описание требований к контракту – цель и предмет закупки.
+                description_of_contract_requirement = contract.get("content__award__contractData__descriptionOfContractRequirement", None)
+                # Указывает, является ли контракт многолетним.
+                multi_year_contract = contract.get("content__award__contractData__multiYearContract", None)
+                # Указывает, является ли связанный IDV (Indefinite Delivery Vehicle) контрактом с одним или несколькими поставщиками.
+                referenced_idv_multiple_or_single = contract.get("content__award__contractData__referencedIDVMultipleOrSingle", None)
+                # Указывает тип IDV-контракта (Indefinite Delivery Vehicle).
+                referenced_idv_type = contract.get("content__award__contractData__referencedIDVType", None)
+                # Указывает, применяются ли к контракту требования по стандартам труда.
+                labor_standards = contract.get("content__award__legislativeMandates__laborStandards", None)
+                # Код, обозначающий тип продукции или услуги, предоставляемой по контракту.
+                psc_code = contract.get("content__award__productOrServiceInformation__productOrServiceCode", None)
+                # Определяет, относится ли контракт к категории "товары" (Product) или "услуги" (Service).
+                psc_type = contract.get("content__award__productOrServiceInformation__productOrServiceCode__productOrServiceType", None)
+                # Основной код отрасли по системе NAICS (North American Industry Classification System).
+                naics_code = contract.get("content__award__productOrServiceInformation__principalNAICSCode", None)
+                # Код страны происхождения товара или услуги.
+                country_of_origin = contract.get("content__award__productOrServiceInformation__countryOfOrigin", None)
+                # Официальное название поставщика, заключившего контракт.
+                vendor_name = contract.get("content__award__vendor__vendorHeader__vendorName", None)
+                # Указывает, относится ли компания к категории малого бизнеса.
+                is_small_business = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isSmallBusiness", None)
+                # Указывает, принадлежит ли компания ветерану с ограниченными возможностями, связанными со службой.
+                is_veteran_owned_business = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isServiceRelatedDisabledVeteranOwnedBusiness", None)
+                # Указывает, принадлежит ли компания женщине.
+                is_women_owned = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isWomenOwned", None)
+                # Указывает, является ли компания очень малым бизнесом.
+                is_very_small_business = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isVerySmallBusiness", None)
+                # Указывает, принадлежит ли компания малому бизнесу, управляемому женщиной.
+                is_women_owned_small_business = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isWomenOwnedSmallBusiness", None)
+                # Указывает, принадлежит ли компания экономически обездоленной женщине, владеющей малым бизнесом.
+                is_economically_disadvantaged_women_owned_small_business = contract.get("content__award__vendor__vendorSiteDetails__vendorSocioEconomicIndicators__isEconomicallyDisadvantagedWomenOwnedSmallBusiness", None)
+                # Указывает, является ли организация партнёрством или партнёрством с ограниченной ответственностью.
+                is_partnership_or_limited_liability_partnership = contract.get("content__award__vendor__vendorSiteDetails__vendorBusinessTypes__businessOrOrganizationType__isPartnershipOrLimitedLiabilityPartnership", None)
+                # Указывает, получает ли организация как контракты, так и гранты от федерального правительства.
+                receives_contracts_and_grants = contract.get("content__award__vendor__vendorSiteDetails__vendorRelationshipWithFederalGovernment__receivesContractsAndGrants", None)
+                # Указывает, является ли организация коммерческой, целью которой является получение прибыли.
+                is_for_profit_organization = contract.get("content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__profitStructure__isForProfitOrganization", None)
+                # Указывает штат, в котором зарегистрирована организация.
+                vendor_state_of_incorporation = contract.get("content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__stateOfIncorporation", None)
+                # Указывает страну, в которой зарегистрирована организация.
+                vendor_country_of_incorporation = contract.get("content__award__vendor__vendorSiteDetails__vendorOrganizationFactors__countryOfIncorporation", None)
+                # Улица, на которой расположена организация.
+                vendor_location_street_address = contract.get("content__award__vendor__vendorSiteDetails__vendorLocation__streetAddress", None)
+                # Город, в котором расположена организация.
+                vendor_location_city = contract.get("content__award__vendor__vendorSiteDetails__vendorLocation__city", None)
+                # Код штата, в котором расположена организация.
+                vendor_location_state = contract.get("content__award__vendor__vendorSiteDetails__vendorLocation__state", None)
+                # Город, соответствующий почтовому индексу.
+                vendor_location_zipcode = contract.get("content__award__vendor__vendorSiteDetails__vendorLocation__ZIPCode", None)
+                # Код страны, в которой расположена организация.
+                vendor_location_country = contract.get("content__award__vendor__vendorSiteDetails__vendorLocation__countryCode", None)
+                # Уникальный идентификатор организации (UEI), используемый для официальной идентификации.
+                vendor_uei = contract.get("content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI", None)
+                # UEI основного (родительского) бизнеса или организации, которая является владельцем или управляющим.
+                vendor_ultimate_parent_uei = contract.get("content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__ultimateParentUEI", None)
+                # CAGE (Commercial and Government Entity) код, присвоенный организации для государственных контрактов.
+                vendor_cage_code = contract.get("content__award__vendor__vendorSiteDetails__entityIdentifiers__cageCode", None)
+                # Дата регистрации организации в CCR.
+                vendor_registration_date = contract.get("content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__registrationDate", None)
+                # Дата продления регистрации организации в CCR.
+                vendor_renewal_date = contract.get("content__award__vendor__vendorSiteDetails__ccrRegistrationDetails__renewalDate", None)
+                # Оценка размера бизнеса, произведённая контрактующим офицером.
+                vendor_size = contract.get("content__award__vendor__contractingOfficerBusinessSizeDetermination", None)
+                # Код штата, в котором выполняется контракт.
+                place_of_performance_state = contract.get("content__award__placeOfPerformance__principalPlaceOfPerformance__stateCode", None)
+                # Код страны, в которой выполняется контракт.
+                place_of_performance_country = contract.get("content__award__placeOfPerformance__principalPlaceOfPerformance__countryCode", None)
+                # Почтовый индекс места исполнения контракта.
+                place_of_performance_zip = contract.get("content__award__placeOfPerformance__placeOfPerformanceZIPCode", None)
+                # Уровень конкуренции по контракту.
+                competition_extent_competed = contract.get("content__award__competition__extentCompeted", None)
+                # Процедура подачи предложений для контракта.
+                competition_solicitation_procedures = contract.get("content__award__competition__solicitationProcedures", None)
+                # Причина, по которой контракт не был конкурентным.
+                competition_reason_not_competed = contract.get("content__award__competition__reasonNotCompeted", None)
+                # !!!!!!!
+                competition_number_of_offers_received = int(contract.get("content__award__competition__numberOfOffersReceived", 0) or 0)
+                # Количество предложений, полученных для контракта.
+                competition_idv_number_of_offers_received = int(contract.get("content__award__competition__idvNumberOfOffersReceived", 0) or 0)
+                # Указывает, были ли сделаны публичные объявления о федеральных бизнес-возможностях (Federal Business Opportunities).
+                competition_fed_biz_opps = contract.get("content__award__competition__fedBizOpps", None)
+                # Статус транзакции.
+                award_transaction_information_status = contract.get("content__award__transactionInformation__status", None)
+
+                
+
+            elif contract.get("contract_type") == "IDV":
                 contract_type = contract.get("contract_type", None)
                 piid = contract.get("content__award__awardID__awardContractID__PIID", None)
                 idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
                 referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
                 mod_number = contract.get("content__IDV__contractID__IDVID__modNumber", None)
-                transaction_number = None  # IDV contracts do not have transactionNumber
+
                 signed_date = contract.get("content__IDV__relevantContractDates__signedDate", None)
                 effective_date = contract.get("content__IDV__relevantContractDates__effectiveDate", None)
-                current_completion_date = contract.get("content__IDV__relevantContractDates__lastDateToOrder", None)
+                # Окончательная дата завершения контракта, учитывая все возможные продления.
+                ultimate_completion_date = contract.get("content__IDV__relevantContractDates__lastDateToOrder", None)
                 obligated_amount = float(contract.get("content__IDV__dollarValues__obligatedAmount", 0) or 0)
                 base_and_exercised_options_value = None
                 base_and_all_options_value = float(contract.get("content__IDV__dollarValues__totalEstimatedOrderValue", 0) or 0)
@@ -147,29 +276,6 @@ def save_contracts_to_db(parsed_date, file_path):
                 funding_requesting_office_id = contract.get("content__IDV__purchaserInformation__fundingRequestingOfficeID", None)
                 number_of_offers_received = int(contract.get("content__IDV__competition__numberOfOffersReceived", 0) or 0)
                 extent_competed = contract.get("content__IDV__competition__extentCompeted", None)
-
-            elif contract.get("contract_type") == "AWARD":
-                contract_type = contract.get("contract_type", None)
-                piid = contract.get("content__award__awardID__awardContractID__PIID", None)
-                idv_piid = contract.get("content__IDV__contractID__IDVID__PIID", None)
-                referenced_piid = contract.get("content__award__awardID__referencedIDVID__PIID", None)
-                mod_number = contract.get("content__award__awardID__awardContractID__modNumber", None)
-                transaction_number = contract.get("content__award__awardID__awardContractID__transactionNumber", None)
-                signed_date = contract.get("content__award__relevantContractDates__signedDate", None)
-                effective_date = contract.get("content__award__relevantContractDates__effectiveDate", None)
-                current_completion_date = contract.get("content__award__relevantContractDates__currentCompletionDate", None)
-                obligated_amount = float(contract.get("content__award__dollarValues__obligatedAmount", 0) or 0)
-                base_and_exercised_options_value = float(contract.get("content__award__dollarValues__baseAndExercisedOptionsValue", 0) or 0)
-                base_and_all_options_value = float(contract.get("content__award__totalDollarValues__totalBaseAndAllOptionsValue", 0) or 0)
-                vendor_uei = contract.get("content__award__vendor__vendorSiteDetails__entityIdentifiers__vendorUEIInformation__UEI", None)
-                naics_code = contract.get("content__award__productOrServiceInformation__principalNAICSCode", None)
-                psc_code = contract.get("content__award__productOrServiceInformation__productOrServiceCode", None)
-                contracting_office_agency_id = contract.get("content__award__purchaserInformation__contractingOfficeAgencyID", None)
-                contracting_office_id = contract.get("content__award__purchaserInformation__contractingOfficeID", None)
-                funding_requesting_agency_id = contract.get("content__award__purchaserInformation__fundingRequestingAgencyID", None)
-                funding_requesting_office_id = contract.get("content__award__purchaserInformation__fundingRequestingOfficeID", None)
-                number_of_offers_received = int(contract.get("content__award__competition__numberOfOffersReceived", 0) or 0)
-                extent_competed = contract.get("content__award__competition__extentCompeted", None)
             
             elif contract.get("contract_type") == "OTHERTRANSACTIONAWARD":
                 contract_type = contract.get("contract_type", None)
@@ -177,10 +283,11 @@ def save_contracts_to_db(parsed_date, file_path):
                 idv_piid = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__referencedIDVID__PIID", None)
                 referenced_piid = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__referencedIDVID__PIID", None)
                 mod_number = contract.get("content__OtherTransactionAward__OtherTransactionAwardID__OtherTransactionAwardContractID__modNumber", None)
-                transaction_number = None  # do not have it
+
                 signed_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate", None)
                 effective_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__effectiveDate", None)
-                current_completion_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__currentCompletionDate", None)
+                # Окончательная дата завершения контракта, учитывая все возможные продления.
+                ultimate_completion_date = contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__currentCompletionDate", None)
                 obligated_amount = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__obligatedAmount", 0) or 0)
                 base_and_exercised_options_value = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__baseAndExercisedOptionsValue", 0) or 0)
                 base_and_all_options_value = float(contract.get("content__OtherTransactionAward__contractDetail__dollarValues__baseAndAllOptionsValue", 0) or 0)
@@ -200,10 +307,11 @@ def save_contracts_to_db(parsed_date, file_path):
                 idv_piid = contract.get("content__OtherTransactionIDV__OtherTransactionIDVID__OtherTransactionIDVContractID__PIID", None)
                 referenced_piid = None  # do not have it
                 mod_number = contract.get("content__OtherTransactionIDV__OtherTransactionIDVID__OtherTransactionIDVContractID__modNumber", None)
-                transaction_number = None  # do not have it
+   
                 signed_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate", None)
                 effective_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__effectiveDate", None)
-                current_completion_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__currentCompletionDate", None)
+                # Окончательная дата завершения контракта, учитывая все возможные продления.
+                ultimate_completion_date = contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__currentCompletionDate", None)
                 obligated_amount = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__obligatedAmount", 0) or 0)
                 base_and_exercised_options_value = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__baseAndExercisedOptionsValue", 0) or 0)
                 base_and_all_options_value = float(contract.get("content__OtherTransactionIDV__contractDetail__dollarValues__baseAndAllOptionsValue", 0) or 0)
@@ -229,29 +337,64 @@ def save_contracts_to_db(parsed_date, file_path):
 
             # Preparing data for insertion into the DB
             contract_data = (
-                contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
-                effective_date, current_completion_date, obligated_amount, 
-                base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
-                naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
-                funding_requesting_agency_id, funding_requesting_office_id, 
-                number_of_offers_received, extent_competed, str(Path(file_path).with_suffix(".parquet"))
+                contract_type, 
+                modified, 
+                agency_id, 
+                piid, 
+                idv_piid, 
+                referenced_piid, 
+                mod_number, 
+                signed_date, 
+                effective_date, 
+                ultimate_completion_date, 
+                obligated_amount, 
+                base_and_all_options_value,
+                total_obligated_amount,
+                total_base_and_all_options_value,
+                vendor_uei, 
+                naics_code, 
+                psc_code, 
+                contracting_office_agency_id, 
+                contracting_office_id, 
+                funding_requesting_agency_id, 
+                funding_requesting_office_id, 
+                number_of_offers_received, 
+                extent_competed, 
+                str(Path(file_path).with_suffix(".parquet"))
             )
 
             # Insert into DB (no duplicates)
             try:
                 cursor.executemany("""
                     INSERT INTO contracts (
-                        contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
-                        effective_date, current_completion_date, obligated_amount, 
-                        base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
-                        naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
-                        funding_requesting_agency_id, funding_requesting_office_id, 
-                        number_of_offers_received, extent_competed, file_path, created_at, updated_at
+                        contract_type, 
+                        modified, 
+                        agency_id, 
+                        piid, 
+                        idv_piid, 
+                        referenced_piid, 
+                        mod_number, 
+                        signed_date, 
+                        effective_date,
+                        ultimate_completion_date,
+                        obligated_amount, 
+                        base_and_all_options_value,
+                        total_obligated_amount,
+                        total_base_and_all_options_value,
+                        vendor_uei, 
+                        naics_code, 
+                        psc_code, 
+                        contracting_office_agency_id, 
+                        contracting_office_id, 
+                        funding_requesting_agency_id, 
+                        funding_requesting_office_id, 
+                        number_of_offers_received,
+                        extent_competed,
+                        file_path, 
+                        created_at, 
+                        updated_at
                     ) VALUES (
-                        %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s, NOW(), NOW()
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
                 """ , [contract_data])
 
@@ -259,17 +402,34 @@ def save_contracts_to_db(parsed_date, file_path):
                 click.echo(f"⚠️ Duplicate PIID in DB {piid} found! Forcedly adding a new record.")
                 cursor.executemany("""
                     INSERT INTO contracts (
-                        contract_type, piid, idv_piid, referenced_piid, mod_number, transaction_number, signed_date, 
-                        effective_date, current_completion_date, obligated_amount, 
-                        base_and_exercised_options_value, base_and_all_options_value, vendor_uei, 
-                        naics_code, psc_code, contracting_office_agency_id, contracting_office_id, 
-                        funding_requesting_agency_id, funding_requesting_office_id, 
-                        number_of_offers_received, extent_competed, file_path, created_at, updated_at
+                        contract_type, 
+                        modified, 
+                        agency_id, 
+                        piid, 
+                        idv_piid, 
+                        referenced_piid, 
+                        mod_number, 
+                        signed_date, 
+                        effective_date,
+                        ultimate_completion_date,
+                        obligated_amount, 
+                        base_and_all_options_value,
+                        total_obligated_amount,
+                        total_base_and_all_options_value,
+                        vendor_uei, 
+                        naics_code, 
+                        psc_code, 
+                        contracting_office_agency_id, 
+                        contracting_office_id, 
+                        funding_requesting_agency_id, 
+                        funding_requesting_office_id, 
+                        number_of_offers_received,
+                        extent_competed,
+                        file_path, 
+                        created_at, 
+                        updated_at
                     ) VALUES (
-                        %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, 
-                        %s, %s, %s, %s, %s, %s
-                        %s, %s, %s, %s, %s, %s, NOW(), NOW()
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW()
                     )
                 """ , [contract_data])
 
