@@ -24,15 +24,15 @@ def upgrade():
         # Тип контракта (например, AWARD, IDV, OTHERTRANSACTIONAWARD, OTHERTRANSACTIONIDV).
         sa.Column('contract_type', sa.String(255), nullable=True, index=True, comment="The type of contract (e.g., IDV, AWARD, OTHERTRANSACTIONAWARD)"),
         # Дата и время последнего изменения данных о контракте.
-        sa.Column('modified', sa.TIMESTAMP, nullable=True, comment=""),
+        sa.Column('modified', sa.TIMESTAMP, nullable=True, index=True, comment="Timestamp of the last modification date of the contract data"),
         # Код агентства, заключившего контракт.
-        sa.Column('agency_id', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('agency_id', sa.String(255), nullable=True, index=True, comment="Unique identifier for the agency that awarded the contract"),
         # Уникальный идентификатор контракта (Procurement Instrument Identifier, PIID).
-        sa.Column('piid', sa.String(255), nullable=True, comment="The Procurement Instrument Identifier (PIID)"),
+        sa.Column('piid', sa.String(255), nullable=True, index=True, comment="The Procurement Instrument Identifier (PIID)"),
         # Номер модификации контракта.
-        sa.Column('mod_number', sa.String(255), nullable=True, comment="The modification number of the award or contract"),
+        sa.Column('mod_number', sa.String(255), nullable=True, index=True, comment="The modification number of the award or contract"),
         # IDV
-        sa.Column('idv_piid', sa.String(255), nullable=True, comment="The PIID of the IDV contract if applicable"),
+        sa.Column('idv_piid', sa.String(255), nullable=True, index=True, comment="The PIID of the IDV contract if applicable"),
         # PIID для родительского контракта
         sa.Column('referenced_piid', sa.String(255), nullable=True, index=True, comment="The PIID for the referenced award or contract"),
         # Дата подписания контракта.
@@ -40,15 +40,15 @@ def upgrade():
         # Дата вступления контракта в силу.
         sa.Column('effective_date', sa.Date, nullable=True, index=True, comment="The effective start date of the contract"),
         # Окончательная дата завершения контракта, учитывая все возможные продления.
-        sa.Column('ultimate_completion_date', sa.Date, nullable=True, index=True, comment=""),
+        sa.Column('ultimate_completion_date', sa.Date, nullable=True, index=True, comment="The final completion date of the contract, including any extensions or modifications"),
         # Сумма, фактически выделенная по контракту (обязательства по оплате).
         sa.Column('obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment="The obligated amount of funds for the contract"),
         # Полная стоимость контракта, включая все возможные опции (даже если они ещё не активированы).
         sa.Column('base_and_all_options_value', sa.Numeric(15, 2), nullable=True, index=True, comment="The value of base and all options"),
         # Общая сумма, выделенная по контракту (включает все модификации и изменения).
-        sa.Column('total_obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment=""),
+        sa.Column('total_obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment="The total amount of funds obligated under the contract, including any modifications or additional funding"),
         # Полная стоимость контракта, включая базовую сумму и все возможные опции (даже если они не активированы).
-        sa.Column('total_base_and_all_options_value', sa.Numeric(15, 2), nullable=True, index=True, comment=""),
+        sa.Column('total_base_and_all_options_value', sa.Numeric(15, 2), nullable=True, index=True, comment="The total value of the contract, including the base value and all exercised options"),
         # Код агентства, заключившего контракт.
         sa.Column('contracting_office_agency_id', sa.String(255), nullable=True, index=True, comment="The ID of the contracting office agency"),
         # Код контрактного офиса, который оформил контракт.
@@ -58,93 +58,93 @@ def upgrade():
         # Код офиса, запрашивающего финансирование для контракта.
         sa.Column('funding_requesting_office_id', sa.String(255), nullable=True, index=True, comment="The ID of the funding or requesting office"),
         # Описание типа действия по контракту.
-        sa.Column('contract_action_type_description', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('contract_action_type_description', sa.String(255), nullable=True, index=True, comment="Description of the type of contract action"),
         # Тип ценообразования.
-        sa.Column('type_of_contract_pricing_description', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('type_of_contract_pricing_description', sa.String(255), nullable=True, index=True, comment="Description of the contract pricing type"),
         # Описание требований к контракту – цель и предмет закупки.
-        sa.Column('description_of_contract_requirement', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('description_of_contract_requirement', sa.String(255), nullable=True, index=True, comment="Description of the contract requirement, including the purpose and scope of the procurement"),
         # Указывает, является ли контракт многолетним.
-        sa.Column('multi_year_contract', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('multi_year_contract', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract is multi-year or not"),
         # Указывает, является ли связанный IDV (Indefinite Delivery Vehicle) контрактом с одним или несколькими поставщиками.
-        sa.Column('referenced_idv_multiple_or_single', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('referenced_idv_multiple_or_single', sa.String(255), nullable=True, index=True, comment="Indicates whether the referenced IDV contract is for a single award or multiple awards"),
         # Указывает тип IDV-контракта (Indefinite Delivery Vehicle).
-        sa.Column('referenced_idv_type', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('referenced_idv_type', sa.String(255), nullable=True, index=True, comment="The type of the referenced IDV contract (e.g., BOA, IDIQ, etc.)"),
         # Указывает, применяются ли к контракту требования по стандартам труда.
-        sa.Column('labor_standards', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('labor_standards', sa.String(255), nullable=True, index=True, comment="Indicates whether labor standards apply to the contract"),
         # Код, обозначающий тип продукции или услуги, предоставляемой по контракту.
         sa.Column('psc_code', sa.String(255), nullable=True, index=True, comment="The product or service code"),
         # Определяет, относится ли контракт к категории "товары" (Product) или "услуги" (Service).
-        sa.Column('psc_type', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('psc_type', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract is for a product or a service"),
         # Основной код отрасли по системе NAICS (North American Industry Classification System).
         sa.Column('naics_code', sa.String(255), nullable=True, index=True, comment="The principal NAICS code"),
         # Код страны происхождения товара или услуги.
-        sa.Column('country_of_origin', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('country_of_origin', sa.String(255), nullable=True, index=True, comment="The country of origin of the goods or services provided under the contract"),
         # Официальное название поставщика, заключившего контракт.
-        sa.Column('vendor_name', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_name', sa.String(255), nullable=True, index=True, comment="The official name of the vendor or contractor awarded the contract"),
         # Указывает, относится ли компания к категории малого бизнеса.
-        sa.Column('is_small_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a small business"),
         # Указывает, принадлежит ли компания ветерану с ограниченными возможностями, связанными со службой.
-        sa.Column('is_veteran_owned_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_veteran_owned_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a veteran-owned business"),
         # Указывает, принадлежит ли компания женщине.
-        sa.Column('is_women_owned_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_women_owned_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a women-owned business"),
         # Указывает, является ли компания очень малым бизнесом.
-        sa.Column('is_very_small_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_very_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is classified as a very small business"),
         # Указывает, принадлежит ли компания малому бизнесу, управляемому женщиной.
-        sa.Column('is_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a women-owned small business"),
         # Указывает, принадлежит ли компания экономически обездоленной женщине, владеющей малым бизнесом.
-        sa.Column('is_economically_disadvantaged_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_economically_disadvantaged_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is an economically disadvantaged women-owned small business"),
         # Указывает, является ли организация партнёрством или партнёрством с ограниченной ответственностью.
-        sa.Column('is_partnership_or_limited_liability_partnership', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_partnership_or_limited_liability_partnership', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a partnership or limited liability partnership"),
         # Указывает, получает ли организация как контракты, так и гранты от федерального правительства.
-        sa.Column('receives_contracts_and_grants', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('receives_contracts_and_grants', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor receives both contracts and grants"),
         # Указывает, является ли организация коммерческой, целью которой является получение прибыли.
-        sa.Column('is_for_profit_organization', sa.Boolean(), nullable=True, index=True, comment=""),
+        sa.Column('is_for_profit_organization', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a for-profit organization"),
         # Указывает штат, в котором зарегистрирована организация.
-        sa.Column('vendor_state_of_incorporation', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_state_of_incorporation', sa.String(255), nullable=True, index=True, comment="The state where the vendor is incorporated"),
         # Указывает страну, в которой зарегистрирована организация.
-        sa.Column('vendor_country_of_incorporation', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_country_of_incorporation', sa.String(255), nullable=True, index=True, comment="The country where the vendor is incorporated"),
         # Город, в котором расположена организация.
-        sa.Column('vendor_location_city', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_location_city', sa.String(255), nullable=True, index=True, comment="The city where the vendor is located"),
         # Код штата, в котором расположена организация.
-        sa.Column('vendor_location_state', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_location_state', sa.String(255), nullable=True, index=True, comment="The state where the vendor is located"),
         # Почтовый индекс местоположения организации.
-        sa.Column('vendor_location_zipcode', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_location_zipcode', sa.String(255), nullable=True, index=True, comment="The ZIP code of the vendor's location"),
         # Код страны, в которой расположена организация.
-        sa.Column('vendor_location_country', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_location_country', sa.String(255), nullable=True, index=True, comment="The country where the vendor is located"),
         # Уникальный идентификатор организации (UEI), используемый для официальной идентификации.
-        sa.Column('vendor_uei', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_uei', sa.String(255), nullable=True, index=True, comment="The Unique Entity Identifier (UEI) of the vendor"),
         # UEI основного (родительского) бизнеса или организации, которая является владельцем или управляющим.
-        sa.Column('vendor_ultimate_parent_uei', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_ultimate_parent_uei', sa.String(255), nullable=True, index=True, comment="The Unique Entity Identifier (UEI) of the vendor's ultimate parent company"),
         # CAGE (Commercial and Government Entity) код, присвоенный организации для государственных контрактов.
-        sa.Column('vendor_cage_code', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_cage_code', sa.String(255), nullable=True, index=True, comment="The Commercial and Government Entity (CAGE) code of the vendor"),
         # Дата регистрации организации в CCR.
-        sa.Column('vendor_registration_date', sa.Date, nullable=True, index=True, comment=""),
+        sa.Column('vendor_registration_date', sa.Date, nullable=True, index=True, comment="The date when the vendor was registered"),
         # Дата продления регистрации организации в CCR.
-        sa.Column('vendor_renewal_date', sa.Date, nullable=True, index=True, comment=""),
+        sa.Column('vendor_renewal_date', sa.Date, nullable=True, index=True, comment="The date when the vendor's registration was last renewed"),
         # Оценка размера бизнеса, произведённая контрактующим офицером.
-        sa.Column('vendor_size', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('vendor_size', sa.String(255), nullable=True, index=True, comment="The size classification of the vendor"),
         # Код штата, в котором выполняется контракт.
-        sa.Column('place_of_performance_state', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('place_of_performance_state', sa.String(255), nullable=True, index=True, comment="The state where the contract work will be performed"),
         # Код страны, в которой выполняется контракт.
-        sa.Column('place_of_performance_country', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('place_of_performance_country', sa.String(255), nullable=True, index=True, comment="The country where the contract work will be performed"),
         # Почтовый индекс места исполнения контракта.
-        sa.Column('place_of_performance_zip', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('place_of_performance_zip', sa.String(255), nullable=True, index=True, comment="The ZIP code where the contract work will be performed"),
         # Уровень конкуренции по контракту.
-        sa.Column('competition_extent_competed', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_extent_competed', sa.String(255), nullable=True, index=True, comment="Indicates the extent of competition for the contract"),
         # Процедура подачи предложений для контракта.
-        sa.Column('competition_solicitation_procedures', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_solicitation_procedures', sa.String(255), nullable=True, index=True, comment="Describes the solicitation procedures used for the contract"),
         # Причина, по которой контракт не был конкурентным.
-        sa.Column('competition_reason_not_competed', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_reason_not_competed', sa.String(255), nullable=True, index=True, comment="Reason why the contract was not competed"),
         # !!!!!!!
-        sa.Column('competition_number_of_offers_received', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_number_of_offers_received', sa.String(255), nullable=True, index=True, comment="The number of offers received for the contract"),
         # Количество предложений, полученных для контракта.
-        sa.Column('competition_idv_number_of_offers_received', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_idv_number_of_offers_received', sa.String(255), nullable=True, index=True, comment="The number of offers received for the IDV (Indefinite Delivery Vehicle) contract"),
         # Указывает, были ли сделаны публичные объявления о федеральных бизнес-возможностях (Federal Business Opportunities).
-        sa.Column('competition_fed_biz_opps', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('competition_fed_biz_opps', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract was posted on FedBizOpps (Federal Business Opportunities)"),
         # Статус транзакции.
-        sa.Column('award_transaction_information_status', sa.String(255), nullable=True, index=True, comment=""),
+        sa.Column('award_transaction_information_status', sa.String(255), nullable=True, index=True, comment="The status of the contract transaction"),
 
-        sa.Column('file_path', sa.String(255), nullable=False, comment="The file path to the stored file data"),
+        sa.Column('file_path', sa.String(255), nullable=True, index=True, comment="The file path to the stored file data"),
         sa.Column('created_at', sa.TIMESTAMP, nullable=True, server_default=sa.text('CURRENT_TIMESTAMP'), comment="Timestamp of record creation"),
         sa.Column('updated_at', sa.TIMESTAMP, nullable=True, server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), comment="Timestamp of last update"),
     )

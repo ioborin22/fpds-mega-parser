@@ -1416,7 +1416,7 @@
 "content__award__vendor__contractingOfficerBusinessSizeDetermination": "O"
 # Переменная: `vendor_size`
 # Описание: Оценка размера бизнеса, произведённая контрактующим офицером.
-# Формат: Строка (String), например, "O", что может означать "Other Than Small Business" (Не малый бизнес).
+# Формат: Строка (String).
 # Важность для анализа: `Высокая` – полезно для понимания размера бизнеса и его классификации.
 
 "content__award__vendor__contractingOfficerBusinessSizeDetermination__description": "OTHER THAN SMALL BUSINESS"
