@@ -41,6 +41,8 @@ def upgrade():
         sa.Column('effective_date', sa.Date, nullable=True, index=True, comment="The effective start date of the contract"),
         # Окончательная дата завершения контракта, учитывая все возможные продления.
         sa.Column('ultimate_completion_date', sa.Date, nullable=True, index=True, comment="The final completion date of the contract, including any extensions or modifications"),
+        # Дата размещения окончательных заказов по контракту
+        sa.Column('last_date_to_order', sa.Date, nullable=True, index=True, comment="The last date by which orders can be placed under this IDV contract"),
         # Сумма, фактически выделенная по контракту (обязательства по оплате).
         sa.Column('obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment="The obligated amount of funds for the contract"),
         # Полная стоимость контракта, включая все возможные опции (даже если они ещё не активированы).
@@ -62,7 +64,7 @@ def upgrade():
         # Тип ценообразования.
         sa.Column('type_of_contract_pricing_description', sa.String(255), nullable=True, index=True, comment="Description of the contract pricing type"),
         # Описание требований к контракту – цель и предмет закупки.
-        sa.Column('description_of_contract_requirement', sa.String(255), nullable=True, index=True, comment="Description of the contract requirement, including the purpose and scope of the procurement"),
+        sa.Column('description_of_contract_requirement', sa.Text, nullable=True, comment="Description of the contract requirement, including the purpose and scope of the procurement"),
         # Указывает, является ли контракт многолетним.
         sa.Column('multi_year_contract', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract is multi-year or not"),
         # Указывает, является ли связанный IDV (Indefinite Delivery Vehicle) контрактом с одним или несколькими поставщиками.
@@ -103,6 +105,8 @@ def upgrade():
         sa.Column('vendor_state_of_incorporation', sa.String(255), nullable=True, index=True, comment="The state where the vendor is incorporated"),
         # Указывает страну, в которой зарегистрирована организация.
         sa.Column('vendor_country_of_incorporation', sa.String(255), nullable=True, index=True, comment="The country where the vendor is incorporated"),
+        # Адресс, в котором расположена организация.
+        sa.Column('vendor_location_street_address', sa.String(255), nullable=True, index=True, comment="The street address where the vendor is located"),
         # Город, в котором расположена организация.
         sa.Column('vendor_location_city', sa.String(255), nullable=True, index=True, comment="The city where the vendor is located"),
         # Код штата, в котором расположена организация.
