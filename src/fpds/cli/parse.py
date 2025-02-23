@@ -6,7 +6,13 @@ import os
 import pandas as pd
 import traceback
 
-from datetime import datetime
+import time
+import mysql.connector
+from alembic.config import Config
+from alembic import command
+
+
+from datetime import datetime, timedelta
 from itertools import chain
 from pathlib import Path
 from click import UsageError
@@ -639,15 +645,47 @@ def save_contracts_to_db(parsed_date, file_path):
 @click.argument("date")
 def parse(date, output):
     """
-    Parsing command for the FPDS Atom feed with date input
+    Parses FPDS Atom feed for a given date or automatically finds the next date if 'all' is provided.
 
-    \b
     Usage:
         $ fpds parse YYYY/MM/DD [OPTIONS]
+        $ fpds parse all
     """
 
-    # Check if the data already exists in the database before downloading
-    year, month, day = date.split("/")
+    conn = get_db_connection()
+    if conn is None:
+        click.echo("⚠️ Unable to connect to the database.")
+        return
+
+    cursor = conn.cursor()
+
+    # Если указано "all", ищем последнюю завершенную дату
+    if date.lower() == "all":
+        click.echo("🔍 Finding the last completed parsing date...")
+
+        cursor.execute("""
+            SELECT MAX(parsed_date) FROM parser_stage WHERE status = 'completed'
+        """)
+        last_parsed_date = cursor.fetchone()[0]
+
+        if last_parsed_date is None:
+            click.echo("⚠️ No completed records found. Starting from January 1, 1957.")
+            last_parsed_date = datetime(1957, 10, 1)  # Начинаем с 1 января 1957 года
+        else:
+            last_parsed_date = datetime.strptime(str(last_parsed_date), "%Y-%m-%d")
+
+        # Увеличиваем дату на 1 день
+        next_parsing_date = last_parsed_date + timedelta(days=1)
+        date = next_parsing_date.strftime("%Y/%m/%d")
+
+        click.echo(f"🚀 Starting parsing from {date}")
+
+    try:
+        year, month, day = date.split("/")
+    except ValueError:
+        click.echo(f"⚠️ Invalid date format: {date}. Expected format: YYYY/MM/DD")
+        return
+
     DATA_FILE = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
     if not log_parsing_result(date, str(DATA_FILE), "pending"):
         return
@@ -672,10 +710,19 @@ def parse(date, output):
         data = asyncio.run(request.data())
         records = list(chain.from_iterable(data))
 
+        # Если записей нет, удаляем JSON и выходим
+        if not records:
+            click.echo("⚠️ No records found. Skipping file creation.")
+            if DATA_FILE.exists():
+                os.remove(DATA_FILE)
+                click.echo(f"🗑 Deleted empty JSON file: {DATA_FILE}")
+            log_parsing_result(date, str(DATA_FILE), "completed", update=True)
+            return
+
         # Create directory if it does not exist
         DATA_DIR = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year)
         DATA_DIR.mkdir(parents=True, exist_ok=True)
-        
+
         # Save data to file
         with open(DATA_FILE, "w") as outfile:
             json.dump(records, outfile)
@@ -683,17 +730,24 @@ def parse(date, output):
         click.echo(f"📄 Saved {len(records)} records as JSON: {DATA_FILE}")
 
         # Convert JSON to Parquet
-        parquet_file = DATA_FILE.with_suffix(".parquet")  # Replace the extension .json → .parquet
+        parquet_file = DATA_FILE.with_suffix(".parquet")
 
         # Load JSON
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
 
+        # Если данных нет (JSON пустой), удаляем JSON и не создаем Parquet
+        if not data:
+            click.echo("⚠️ JSON file is empty. Deleting it and skipping Parquet conversion.")
+            os.remove(DATA_FILE)
+            log_parsing_result(date, str(DATA_FILE), "failed", update=True)
+            return
+
         # Convert to DataFrame
         df = pd.DataFrame(data)
 
         # Save to Parquet
-        df.to_parquet(parquet_file, engine="pyarrow", compression="snappy")  # or "gzip", "zstd"
+        df.to_parquet(parquet_file, engine="pyarrow", compression="snappy")
 
         click.echo(f"🎯 JSON successfully converted to Parquet: {parquet_file}")
 
@@ -706,3 +760,16 @@ def parse(date, output):
     except Exception as e:
         log_parsing_result(date, str(DATA_FILE), "failed", update=True)
         click.echo(f"Error occurred while parsing: {e}")
+
+    conn.close()
+
+while True:
+    try:
+        parse(["all"], None)  # Запускаем парсер
+        time.sleep(5)  # Ждем 5 секунд перед следующим запуском
+    except KeyboardInterrupt:
+        print("⏹ Остановка парсера...")
+        break  # Останавливаем цикл при нажатии Ctrl+C
+    except Exception as e:
+        print(f"⚠️ Ошибка в цикле парсинга: {e}")
+        time.sleep(5)  # Ждем 5 секунд перед новой попыткой

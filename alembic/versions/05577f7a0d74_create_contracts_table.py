@@ -1,13 +1,12 @@
-"""create contracts table
+"""create contracts table with partitioning
 
 Revision ID: 05577f7a0d74
 Revises: 
 Create Date: 2025-02-15 17:35:00.588374
-
 """
+
 from alembic import op
 import sqlalchemy as sa
-
 
 # revision identifiers, used by Alembic.
 revision = '05577f7a0d74'
@@ -15,145 +14,183 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-# sa.Column('###', sa.String(255), nullable=True, index=True, comment=""),
 def upgrade():
-    """Create contracts table."""
-    op.create_table(
-        'contracts',
-        sa.Column('id', sa.BigInteger, primary_key=True, autoincrement=True, comment="Primary key"),
-        # Тип контракта (например, AWARD, IDV, OTHERTRANSACTIONAWARD, OTHERTRANSACTIONIDV).
-        sa.Column('contract_type', sa.String(255), nullable=True, index=True, comment="The type of contract (e.g., IDV, AWARD, OTHERTRANSACTIONAWARD)"),
-        # Дата и время последнего изменения данных о контракте.
-        sa.Column('modified', sa.TIMESTAMP, nullable=True, index=True, comment="Timestamp of the last modification date of the contract data"),
-        # Код агентства, заключившего контракт.
-        sa.Column('agency_id', sa.String(255), nullable=True, index=True, comment="Unique identifier for the agency that awarded the contract"),
-        # Уникальный идентификатор контракта (Procurement Instrument Identifier, PIID).
-        sa.Column('piid', sa.String(255), nullable=True, index=True, comment="The Procurement Instrument Identifier (PIID)"),
-        # Номер модификации контракта.
-        sa.Column('mod_number', sa.String(255), nullable=True, index=True, comment="The modification number of the award or contract"),
-        # IDV
-        sa.Column('idv_piid', sa.String(255), nullable=True, index=True, comment="The PIID of the IDV contract if applicable"),
-        # PIID для родительского контракта
-        sa.Column('referenced_piid', sa.String(255), nullable=True, index=True, comment="The PIID for the referenced award or contract"),
-        # Дата подписания контракта.
-        sa.Column('signed_date', sa.Date, nullable=True, index=True, comment="The date the contract was signed"),
-        # Дата вступления контракта в силу.
-        sa.Column('effective_date', sa.Date, nullable=True, index=True, comment="The effective start date of the contract"),
-        # Окончательная дата завершения контракта, учитывая все возможные продления.
-        sa.Column('ultimate_completion_date', sa.Date, nullable=True, index=True, comment="The final completion date of the contract, including any extensions or modifications"),
-        # Дата размещения окончательных заказов по контракту
-        sa.Column('last_date_to_order', sa.Date, nullable=True, index=True, comment="The last date by which orders can be placed under this IDV contract"),
-        # Сумма, фактически выделенная по контракту (обязательства по оплате).
-        sa.Column('obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment="The obligated amount of funds for the contract"),
-        # Полная стоимость контракта, включая все возможные опции (даже если они ещё не активированы).
-        sa.Column('base_and_all_options_value', sa.Numeric(15, 2), nullable=True, index=True, comment="The value of base and all options"),
-        # Общая сумма, выделенная по контракту (включает все модификации и изменения).
-        sa.Column('total_obligated_amount', sa.Numeric(15, 2), nullable=True, index=True, comment="The total amount of funds obligated under the contract, including any modifications or additional funding"),
-        # Полная стоимость контракта, включая базовую сумму и все возможные опции (даже если они не активированы).
-        sa.Column('total_base_and_all_options_value', sa.Numeric(15, 2), nullable=True, index=True, comment="The total value of the contract, including the base value and all exercised options"),
-        # Код агентства, заключившего контракт.
-        sa.Column('contracting_office_agency_id', sa.String(255), nullable=True, index=True, comment="The ID of the contracting office agency"),
-        # Код контрактного офиса, который оформил контракт.
-        sa.Column('contracting_office_id', sa.String(255), nullable=True, index=True, comment="The ID of the contracting office"),
-        # Код агентства, запрашивающего финансирование для контракта.
-        sa.Column('funding_requesting_agency_id', sa.String(255), nullable=True, index=True, comment="The ID of the funding or requesting agency"),
-        # Код офиса, запрашивающего финансирование для контракта.
-        sa.Column('funding_requesting_office_id', sa.String(255), nullable=True, index=True, comment="The ID of the funding or requesting office"),
-        # Описание типа действия по контракту.
-        sa.Column('contract_action_type_description', sa.String(255), nullable=True, index=True, comment="Description of the type of contract action"),
-        # Тип ценообразования.
-        sa.Column('type_of_contract_pricing_description', sa.String(255), nullable=True, index=True, comment="Description of the contract pricing type"),
-        # Описание требований к контракту – цель и предмет закупки.
-        sa.Column('description_of_contract_requirement', sa.Text, nullable=True, comment="Description of the contract requirement, including the purpose and scope of the procurement"),
-        # Указывает, является ли контракт многолетним.
-        sa.Column('multi_year_contract', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract is multi-year or not"),
-        # Указывает, является ли связанный IDV (Indefinite Delivery Vehicle) контрактом с одним или несколькими поставщиками.
-        sa.Column('referenced_idv_multiple_or_single', sa.String(255), nullable=True, index=True, comment="Indicates whether the referenced IDV contract is for a single award or multiple awards"),
-        # Указывает тип IDV-контракта (Indefinite Delivery Vehicle).
-        sa.Column('referenced_idv_type', sa.String(255), nullable=True, index=True, comment="The type of the referenced IDV contract (e.g., BOA, IDIQ, etc.)"),
-        # Указывает, применяются ли к контракту требования по стандартам труда.
-        sa.Column('labor_standards', sa.String(255), nullable=True, index=True, comment="Indicates whether labor standards apply to the contract"),
-        # Код, обозначающий тип продукции или услуги, предоставляемой по контракту.
-        sa.Column('psc_code', sa.String(255), nullable=True, index=True, comment="The product or service code"),
-        # Определяет, относится ли контракт к категории "товары" (Product) или "услуги" (Service).
-        sa.Column('psc_type', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract is for a product or a service"),
-        # Основной код отрасли по системе NAICS (North American Industry Classification System).
-        sa.Column('naics_code', sa.String(255), nullable=True, index=True, comment="The principal NAICS code"),
-        # Код страны происхождения товара или услуги.
-        sa.Column('country_of_origin', sa.String(255), nullable=True, index=True, comment="The country of origin of the goods or services provided under the contract"),
-        # Официальное название поставщика, заключившего контракт.
-        sa.Column('vendor_name', sa.String(255), nullable=True, index=True, comment="The official name of the vendor or contractor awarded the contract"),
-        # Указывает, относится ли компания к категории малого бизнеса.
-        sa.Column('is_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a small business"),
-        # Указывает, принадлежит ли компания ветерану с ограниченными возможностями, связанными со службой.
-        sa.Column('is_veteran_owned_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a veteran-owned business"),
-        # Указывает, принадлежит ли компания женщине.
-        sa.Column('is_women_owned_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a women-owned business"),
-        # Указывает, является ли компания очень малым бизнесом.
-        sa.Column('is_very_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is classified as a very small business"),
-        # Указывает, принадлежит ли компания малому бизнесу, управляемому женщиной.
-        sa.Column('is_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a women-owned small business"),
-        # Указывает, принадлежит ли компания экономически обездоленной женщине, владеющей малым бизнесом.
-        sa.Column('is_economically_disadvantaged_women_owned_small_business', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is an economically disadvantaged women-owned small business"),
-        # Указывает, является ли организация партнёрством или партнёрством с ограниченной ответственностью.
-        sa.Column('is_partnership_or_limited_liability_partnership', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a partnership or limited liability partnership"),
-        # Указывает, получает ли организация как контракты, так и гранты от федерального правительства.
-        sa.Column('receives_contracts_and_grants', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor receives both contracts and grants"),
-        # Указывает, является ли организация коммерческой, целью которой является получение прибыли.
-        sa.Column('is_for_profit_organization', sa.Boolean(), nullable=True, index=True, comment="Indicates whether the vendor is a for-profit organization"),
-        # Указывает штат, в котором зарегистрирована организация.
-        sa.Column('vendor_state_of_incorporation', sa.String(255), nullable=True, index=True, comment="The state where the vendor is incorporated"),
-        # Указывает страну, в которой зарегистрирована организация.
-        sa.Column('vendor_country_of_incorporation', sa.String(255), nullable=True, index=True, comment="The country where the vendor is incorporated"),
-        # Адресс, в котором расположена организация.
-        sa.Column('vendor_location_street_address', sa.String(255), nullable=True, index=True, comment="The street address where the vendor is located"),
-        # Город, в котором расположена организация.
-        sa.Column('vendor_location_city', sa.String(255), nullable=True, index=True, comment="The city where the vendor is located"),
-        # Код штата, в котором расположена организация.
-        sa.Column('vendor_location_state', sa.String(255), nullable=True, index=True, comment="The state where the vendor is located"),
-        # Почтовый индекс местоположения организации.
-        sa.Column('vendor_location_zipcode', sa.String(255), nullable=True, index=True, comment="The ZIP code of the vendor's location"),
-        # Код страны, в которой расположена организация.
-        sa.Column('vendor_location_country', sa.String(255), nullable=True, index=True, comment="The country where the vendor is located"),
-        # Уникальный идентификатор организации (UEI), используемый для официальной идентификации.
-        sa.Column('vendor_uei', sa.String(255), nullable=True, index=True, comment="The Unique Entity Identifier (UEI) of the vendor"),
-        # UEI основного (родительского) бизнеса или организации, которая является владельцем или управляющим.
-        sa.Column('vendor_ultimate_parent_uei', sa.String(255), nullable=True, index=True, comment="The Unique Entity Identifier (UEI) of the vendor's ultimate parent company"),
-        # CAGE (Commercial and Government Entity) код, присвоенный организации для государственных контрактов.
-        sa.Column('vendor_cage_code', sa.String(255), nullable=True, index=True, comment="The Commercial and Government Entity (CAGE) code of the vendor"),
-        # Дата регистрации организации в CCR.
-        sa.Column('vendor_registration_date', sa.Date, nullable=True, index=True, comment="The date when the vendor was registered"),
-        # Дата продления регистрации организации в CCR.
-        sa.Column('vendor_renewal_date', sa.Date, nullable=True, index=True, comment="The date when the vendor's registration was last renewed"),
-        # Оценка размера бизнеса, произведённая контрактующим офицером.
-        sa.Column('vendor_size', sa.String(255), nullable=True, index=True, comment="The size classification of the vendor"),
-        # Код штата, в котором выполняется контракт.
-        sa.Column('place_of_performance_state', sa.String(255), nullable=True, index=True, comment="The state where the contract work will be performed"),
-        # Код страны, в которой выполняется контракт.
-        sa.Column('place_of_performance_country', sa.String(255), nullable=True, index=True, comment="The country where the contract work will be performed"),
-        # Почтовый индекс места исполнения контракта.
-        sa.Column('place_of_performance_zip', sa.String(255), nullable=True, index=True, comment="The ZIP code where the contract work will be performed"),
-        # Уровень конкуренции по контракту.
-        sa.Column('competition_extent_competed', sa.String(255), nullable=True, index=True, comment="Indicates the extent of competition for the contract"),
-        # Процедура подачи предложений для контракта.
-        sa.Column('competition_solicitation_procedures', sa.String(255), nullable=True, index=True, comment="Describes the solicitation procedures used for the contract"),
-        # Причина, по которой контракт не был конкурентным.
-        sa.Column('competition_reason_not_competed', sa.String(255), nullable=True, index=True, comment="Reason why the contract was not competed"),
-        # !!!!!!!
-        sa.Column('competition_number_of_offers_received', sa.String(255), nullable=True, index=True, comment="The number of offers received for the contract"),
-        # Количество предложений, полученных для контракта.
-        sa.Column('competition_idv_number_of_offers_received', sa.String(255), nullable=True, index=True, comment="The number of offers received for the IDV (Indefinite Delivery Vehicle) contract"),
-        # Указывает, были ли сделаны публичные объявления о федеральных бизнес-возможностях (Federal Business Opportunities).
-        sa.Column('competition_fed_biz_opps', sa.String(255), nullable=True, index=True, comment="Indicates whether the contract was posted on FedBizOpps (Federal Business Opportunities)"),
-        # Статус транзакции.
-        sa.Column('award_transaction_information_status', sa.String(255), nullable=True, index=True, comment="The status of the contract transaction"),
+    """Create contracts table with partitioning by year."""
 
-        sa.Column('file_path', sa.String(255), nullable=True, index=True, comment="The file path to the stored file data"),
-        sa.Column('created_at', sa.TIMESTAMP, nullable=True, server_default=sa.text('CURRENT_TIMESTAMP'), comment="Timestamp of record creation"),
-        sa.Column('updated_at', sa.TIMESTAMP, nullable=True, server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), comment="Timestamp of last update"),
-    )
-
+    # Создаем партиционированную таблицу с комментариями и индексами
+    op.execute("""
+        CREATE TABLE contracts (
+            id BIGINT AUTO_INCREMENT COMMENT 'Primary key',
+            partition_year YEAR NOT NULL COMMENT 'Year used for partitioning',
+            agency_id VARCHAR(255) COMMENT 'Unique identifier for the agency that awarded the contract',
+            contract_type VARCHAR(255) COMMENT 'The type of contract (e.g., IDV, AWARD, OTHERTRANSACTIONAWARD)',
+            piid VARCHAR(255) COMMENT 'Procurement Instrument Identifier (PIID)',
+            mod_number VARCHAR(255) COMMENT 'Modification number of the award or contract',
+            idv_piid VARCHAR(255) COMMENT 'The PIID of the IDV contract if applicable',
+            referenced_piid VARCHAR(255) COMMENT 'The PIID for the referenced award or contract',
+            signed_date DATE COMMENT 'The date the contract was signed',
+            effective_date DATE COMMENT 'The effective start date of the contract',
+            ultimate_completion_date DATE COMMENT 'The final completion date of the contract, including any extensions',
+            last_date_to_order DATE COMMENT 'The last date by which orders can be placed under this IDV contract',
+            obligated_amount DECIMAL(15,2) COMMENT 'The obligated amount of funds for the contract',
+            base_and_all_options_value DECIMAL(15,2) COMMENT 'The value of base and all options',
+            total_obligated_amount DECIMAL(15,2) COMMENT 'The total amount of funds obligated under the contract',
+            total_base_and_all_options_value DECIMAL(15,2) COMMENT 'The total value of the contract, including options',
+            contracting_office_agency_id VARCHAR(255) COMMENT 'The ID of the contracting office agency',
+            contracting_office_id VARCHAR(255) COMMENT 'The ID of the contracting office',
+            funding_requesting_agency_id VARCHAR(255) COMMENT 'The ID of the funding or requesting agency',
+            funding_requesting_office_id VARCHAR(255) COMMENT 'The ID of the funding or requesting office',
+            contract_action_type_description VARCHAR(255) COMMENT 'Description of the type of contract action',
+            type_of_contract_pricing_description VARCHAR(255) COMMENT 'Description of the contract pricing type',
+            description_of_contract_requirement TEXT COMMENT 'Description of the contract requirement and scope',
+            multi_year_contract VARCHAR(255) COMMENT 'Indicates whether the contract is multi-year',
+            referenced_idv_multiple_or_single VARCHAR(255) COMMENT 'Indicates whether the referenced IDV contract is for a single or multiple awards',
+            referenced_idv_type VARCHAR(255) COMMENT 'The type of the referenced IDV contract',
+            labor_standards VARCHAR(255) COMMENT 'Indicates whether labor standards apply to the contract',
+            psc_code VARCHAR(255) COMMENT 'The product or service code',
+            psc_type VARCHAR(255) COMMENT 'Indicates whether the contract is for a product or a service',
+            naics_code VARCHAR(255) COMMENT 'The principal NAICS code',
+            country_of_origin VARCHAR(255) COMMENT 'The country of origin of the goods or services provided',
+            vendor_name VARCHAR(255) COMMENT 'The official name of the vendor or contractor awarded the contract',
+            is_small_business BOOLEAN COMMENT 'Indicates whether the vendor is a small business',
+            is_veteran_owned_business BOOLEAN COMMENT 'Indicates whether the vendor is a veteran-owned business',
+            is_women_owned_business BOOLEAN COMMENT 'Indicates whether the vendor is a women-owned business',
+            is_very_small_business BOOLEAN COMMENT 'Indicates whether the vendor is classified as a very small business',
+            is_women_owned_small_business BOOLEAN COMMENT 'Indicates whether the vendor is a women-owned small business',
+            is_economically_disadvantaged_women_owned_small_business BOOLEAN COMMENT 'Indicates whether the vendor is an economically disadvantaged women-owned small business',
+            is_partnership_or_limited_liability_partnership BOOLEAN COMMENT 'Indicates whether the vendor is a partnership or limited liability partnership',
+            receives_contracts_and_grants BOOLEAN COMMENT 'Indicates whether the vendor receives both contracts and grants',
+            is_for_profit_organization BOOLEAN COMMENT 'Indicates whether the vendor is a for-profit organization',
+            vendor_state_of_incorporation VARCHAR(255) COMMENT 'The state where the vendor is incorporated',
+            vendor_country_of_incorporation VARCHAR(255) COMMENT 'The country where the vendor is incorporated',
+            vendor_location_street_address VARCHAR(255) COMMENT 'The street address where the vendor is located',
+            vendor_location_city VARCHAR(255) COMMENT 'The city where the vendor is located',
+            vendor_location_state VARCHAR(255) COMMENT 'The state where the vendor is located',
+            vendor_location_zipcode VARCHAR(255) COMMENT 'The ZIP code of the vendor''s location',
+            vendor_location_country VARCHAR(255) COMMENT 'The country where the vendor is located',
+            vendor_uei VARCHAR(255) COMMENT 'The Unique Entity Identifier (UEI) of the vendor',
+            vendor_ultimate_parent_uei VARCHAR(255) COMMENT 'The Unique Entity Identifier (UEI) of the vendor''s ultimate parent company',
+            vendor_cage_code VARCHAR(255) COMMENT 'The CAGE code of the vendor',
+            vendor_registration_date DATE COMMENT 'The date when the vendor was registered',
+            vendor_renewal_date DATE COMMENT 'The date when the vendor''s registration was last renewed',
+            vendor_size VARCHAR(255) COMMENT 'The size classification of the vendor',
+            place_of_performance_state VARCHAR(255) COMMENT 'The state where the contract work will be performed',
+            place_of_performance_country VARCHAR(255) COMMENT 'The country where the contract work will be performed',
+            place_of_performance_zip VARCHAR(255) COMMENT 'The ZIP code where the contract work will be performed',
+            competition_extent_competed VARCHAR(255) COMMENT 'Indicates the extent of competition for the contract',
+            competition_solicitation_procedures VARCHAR(255) COMMENT 'Describes the solicitation procedures used for the contract',
+            competition_reason_not_competed VARCHAR(255) COMMENT 'Reason why the contract was not competed',
+            competition_number_of_offers_received VARCHAR(255) COMMENT 'The number of offers received for the contract',
+            competition_idv_number_of_offers_received VARCHAR(255) COMMENT 'The number of offers received for the IDV contract',
+            competition_fed_biz_opps VARCHAR(255) COMMENT 'Indicates whether the contract was posted on FedBizOpps',
+            award_transaction_information_status VARCHAR(255) COMMENT 'The status of the contract transaction',
+            file_path VARCHAR(255) COMMENT 'The file path to the stored file data',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of record creation',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp of last update',
+            PRIMARY KEY (id, partition_year),
+            INDEX (partition_year),
+            INDEX (agency_id),
+            INDEX (piid),
+            INDEX (contract_type)
+        )
+        PARTITION BY RANGE (partition_year) (
+            PARTITION p1957 VALUES LESS THAN (1958),
+            PARTITION p1958 VALUES LESS THAN (1959),
+            PARTITION p1959 VALUES LESS THAN (1960),
+            PARTITION p1960 VALUES LESS THAN (1961),
+            PARTITION p1961 VALUES LESS THAN (1962),
+            PARTITION p1962 VALUES LESS THAN (1963),
+            PARTITION p1963 VALUES LESS THAN (1964),
+            PARTITION p1964 VALUES LESS THAN (1965),
+            PARTITION p1965 VALUES LESS THAN (1966),
+            PARTITION p1966 VALUES LESS THAN (1967),
+            PARTITION p1967 VALUES LESS THAN (1968),
+            PARTITION p1968 VALUES LESS THAN (1969),
+            PARTITION p1969 VALUES LESS THAN (1970),
+            PARTITION p1970 VALUES LESS THAN (1971),
+            PARTITION p1971 VALUES LESS THAN (1972),
+            PARTITION p1972 VALUES LESS THAN (1973),
+            PARTITION p1973 VALUES LESS THAN (1974),
+            PARTITION p1974 VALUES LESS THAN (1975),
+            PARTITION p1975 VALUES LESS THAN (1976),
+            PARTITION p1976 VALUES LESS THAN (1977),
+            PARTITION p1977 VALUES LESS THAN (1978),
+            PARTITION p1978 VALUES LESS THAN (1979),
+            PARTITION p1979 VALUES LESS THAN (1980),
+            PARTITION p1980 VALUES LESS THAN (1981),
+            PARTITION p1981 VALUES LESS THAN (1982),
+            PARTITION p1982 VALUES LESS THAN (1983),
+            PARTITION p1983 VALUES LESS THAN (1984),
+            PARTITION p1984 VALUES LESS THAN (1985),
+            PARTITION p1985 VALUES LESS THAN (1986),
+            PARTITION p1986 VALUES LESS THAN (1987),
+            PARTITION p1987 VALUES LESS THAN (1988),
+            PARTITION p1988 VALUES LESS THAN (1989),
+            PARTITION p1989 VALUES LESS THAN (1990),
+            PARTITION p1990 VALUES LESS THAN (1991),
+            PARTITION p1991 VALUES LESS THAN (1992),
+            PARTITION p1992 VALUES LESS THAN (1993),
+            PARTITION p1993 VALUES LESS THAN (1994),
+            PARTITION p1994 VALUES LESS THAN (1995),
+            PARTITION p1995 VALUES LESS THAN (1996),
+            PARTITION p1996 VALUES LESS THAN (1997),
+            PARTITION p1997 VALUES LESS THAN (1998),
+            PARTITION p1998 VALUES LESS THAN (1999),
+            PARTITION p1999 VALUES LESS THAN (2000),
+            PARTITION p2000 VALUES LESS THAN (2001),
+            PARTITION p2001 VALUES LESS THAN (2002),
+            PARTITION p2002 VALUES LESS THAN (2003),
+            PARTITION p2003 VALUES LESS THAN (2004),
+            PARTITION p2004 VALUES LESS THAN (2005),
+            PARTITION p2005 VALUES LESS THAN (2006),
+            PARTITION p2006 VALUES LESS THAN (2007),
+            PARTITION p2007 VALUES LESS THAN (2008),
+            PARTITION p2008 VALUES LESS THAN (2009),
+            PARTITION p2009 VALUES LESS THAN (2010),
+            PARTITION p2010 VALUES LESS THAN (2011),
+            PARTITION p2011 VALUES LESS THAN (2012),
+            PARTITION p2012 VALUES LESS THAN (2013),
+            PARTITION p2013 VALUES LESS THAN (2014),
+            PARTITION p2014 VALUES LESS THAN (2015),
+            PARTITION p2015 VALUES LESS THAN (2016),
+            PARTITION p2016 VALUES LESS THAN (2017),
+            PARTITION p2017 VALUES LESS THAN (2018),
+            PARTITION p2018 VALUES LESS THAN (2019),
+            PARTITION p2019 VALUES LESS THAN (2020),
+            PARTITION p2020 VALUES LESS THAN (2021),
+            PARTITION p2021 VALUES LESS THAN (2022),
+            PARTITION p2022 VALUES LESS THAN (2023),
+            PARTITION p2023 VALUES LESS THAN (2024),
+            PARTITION p2024 VALUES LESS THAN (2025),
+            PARTITION p2025 VALUES LESS THAN (2026),
+            PARTITION p2026 VALUES LESS THAN (2027),
+            PARTITION p2027 VALUES LESS THAN (2028),
+            PARTITION p2028 VALUES LESS THAN (2029),
+            PARTITION p2029 VALUES LESS THAN (2030),
+            PARTITION p2030 VALUES LESS THAN (2031),
+            PARTITION p2031 VALUES LESS THAN (2032),
+            PARTITION p2032 VALUES LESS THAN (2033),
+            PARTITION p2033 VALUES LESS THAN (2034),
+            PARTITION p2034 VALUES LESS THAN (2035),
+            PARTITION p2035 VALUES LESS THAN (2036),
+            PARTITION p2036 VALUES LESS THAN (2037),
+            PARTITION p2037 VALUES LESS THAN (2038),
+            PARTITION p2038 VALUES LESS THAN (2039),
+            PARTITION p2039 VALUES LESS THAN (2040),
+            PARTITION p2040 VALUES LESS THAN (2041),
+            PARTITION p2041 VALUES LESS THAN (2042),
+            PARTITION p2042 VALUES LESS THAN (2043),
+            PARTITION p2043 VALUES LESS THAN (2044),
+            PARTITION p2044 VALUES LESS THAN (2045),
+            PARTITION p2045 VALUES LESS THAN (2046),
+            PARTITION p2046 VALUES LESS THAN (2047),
+            PARTITION p2047 VALUES LESS THAN (2048),
+            PARTITION p2048 VALUES LESS THAN (2049),
+            PARTITION p2049 VALUES LESS THAN (2050),
+            PARTITION p2050 VALUES LESS THAN (2051)
+        );
+    """)
 
 def downgrade():
     """Drop contracts table."""
-    op.drop_table('contracts')
+    op.execute("DROP TABLE IF EXISTS contracts;")
