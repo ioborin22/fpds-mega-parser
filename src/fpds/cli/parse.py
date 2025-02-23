@@ -682,7 +682,7 @@ def parse(date, output):
 
         if last_parsed_date is None:
             click.echo("⚠️ No completed records found. Starting from the earliest available data.")
-            last_parsed_date = datetime(1957, 1, 1)  # Начинаем с 1 января 1957 года
+            last_parsed_date = datetime(1957, 9, 30)  # Начинаем с 1 января 1957 года
         else:
             last_parsed_date = datetime.strptime(str(last_parsed_date), "%Y-%m-%d")
 
@@ -698,9 +698,18 @@ def parse(date, output):
         click.echo(f"⚠️ Invalid date format: {date}. Expected format: YYYY/MM/DD")
         return
 
-    DATA_FILE = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
-    if not log_parsing_result(date, str(DATA_FILE), "pending"):
-        return
+    while True:
+        DATA_FILE = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
+
+        if not log_parsing_result(date, str(DATA_FILE), "completed"):
+            # Если дата уже существует, переходим к следующей дате
+            next_parsing_date = datetime.strptime(date, "%Y/%m/%d") + timedelta(days=1)
+            date = next_parsing_date.strftime("%Y/%m/%d")
+            year, month, day = date.split("/")  # Обновляем переменные
+            click.echo(f"🔄 Data for {date} already exists. Trying next date...")
+            continue  # Пробуем следующую дату
+
+        break  # Если нашли новую дату, выходим из цикла
 
     formatted_date = f"SIGNED_DATE=[{date},{date}]"
     params = [formatted_date.split("=")]
@@ -731,6 +740,16 @@ def parse(date, output):
             json.dump(records, outfile)
 
         click.echo(f"📄 Saved {len(records)} records as JSON: {DATA_FILE}")
+
+        if not records:
+            click.echo(f"⚠️ No records found for {date}. Skipping Parquet file creation.")
+    
+            # Удаляем пустой JSON-файл
+            if os.path.exists(DATA_FILE):
+                os.remove(DATA_FILE)
+                click.echo(f"🗑 Deleted empty JSON file: {DATA_FILE}")
+    
+            return
 
         # Convert JSON to Parquet
         parquet_file = DATA_FILE.with_suffix(".parquet")
