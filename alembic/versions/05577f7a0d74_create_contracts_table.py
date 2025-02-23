@@ -22,8 +22,9 @@ def upgrade():
         CREATE TABLE contracts (
             id BIGINT AUTO_INCREMENT COMMENT 'Primary key',
             partition_year YEAR NOT NULL COMMENT 'Year used for partitioning',
-            agency_id VARCHAR(255) COMMENT 'Unique identifier for the agency that awarded the contract',
             contract_type VARCHAR(255) COMMENT 'The type of contract (e.g., IDV, AWARD, OTHERTRANSACTIONAWARD)',
+            modified TIMESTAMP NULL DEFAULT NULL COMMENT 'The timestamp of the last modification date of the contract data',
+            agency_id VARCHAR(255) COMMENT 'Unique identifier for the agency that awarded the contract',
             piid VARCHAR(255) COMMENT 'Procurement Instrument Identifier (PIID)',
             mod_number VARCHAR(255) COMMENT 'Modification number of the award or contract',
             idv_piid VARCHAR(255) COMMENT 'The PIID of the IDV contract if applicable',

@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import traceback
 
-import time
+import subprocess
 import mysql.connector
 from alembic.config import Config
 from alembic import command
@@ -130,6 +130,7 @@ def save_contracts_to_db(parsed_date, file_path):
                     error_log.write(error_message)
 
                 continue  # Move to the next contract
+
 
             # Fill in the fields depending on the type of contract
             if contract.get("contract_type") == "AWARD":
@@ -467,8 +468,18 @@ def save_contracts_to_db(parsed_date, file_path):
 
                 continue
 
+
+            partition_year = None
+            if signed_date:
+                partition_year = datetime.strptime(signed_date.split(" ")[0], "%Y-%m-%d").year  # Убираем время
+            elif effective_date:
+                partition_year = datetime.strptime(effective_date.split(" ")[0], "%Y-%m-%d").year  # Убираем время
+            else:
+                partition_year = datetime.now().year  # Если даты нет, берем текущий год
+
             # Preparing data for insertion into the DB
             contract_data = (
+                partition_year,
                 contract_type,
                 modified,
                 agency_id,
@@ -540,6 +551,7 @@ def save_contracts_to_db(parsed_date, file_path):
             try:
                 cursor.executemany("""
                     INSERT INTO contracts (
+                        partition_year,
                         contract_type,
                         modified,
                         agency_id,
@@ -607,7 +619,7 @@ def save_contracts_to_db(parsed_date, file_path):
                         created_at, 
                         updated_at
                     ) VALUES (
-                        %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, NOW(), NOW()
+                        %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s,%s, %s, %s, NOW(), NOW()
                     )
                 """ , [contract_data])
 
@@ -669,8 +681,8 @@ def parse(date, output):
         last_parsed_date = cursor.fetchone()[0]
 
         if last_parsed_date is None:
-            click.echo("⚠️ No completed records found. Starting from January 1, 1957.")
-            last_parsed_date = datetime(1957, 10, 1)  # Начинаем с 1 января 1957 года
+            click.echo("⚠️ No completed records found. Starting from the earliest available data.")
+            last_parsed_date = datetime(1957, 1, 1)  # Начинаем с 1 января 1957 года
         else:
             last_parsed_date = datetime.strptime(str(last_parsed_date), "%Y-%m-%d")
 
@@ -710,15 +722,6 @@ def parse(date, output):
         data = asyncio.run(request.data())
         records = list(chain.from_iterable(data))
 
-        # Если записей нет, удаляем JSON и выходим
-        if not records:
-            click.echo("⚠️ No records found. Skipping file creation.")
-            if DATA_FILE.exists():
-                os.remove(DATA_FILE)
-                click.echo(f"🗑 Deleted empty JSON file: {DATA_FILE}")
-            log_parsing_result(date, str(DATA_FILE), "completed", update=True)
-            return
-
         # Create directory if it does not exist
         DATA_DIR = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year)
         DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -735,13 +738,6 @@ def parse(date, output):
         # Load JSON
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
-
-        # Если данных нет (JSON пустой), удаляем JSON и не создаем Parquet
-        if not data:
-            click.echo("⚠️ JSON file is empty. Deleting it and skipping Parquet conversion.")
-            os.remove(DATA_FILE)
-            log_parsing_result(date, str(DATA_FILE), "failed", update=True)
-            return
 
         # Convert to DataFrame
         df = pd.DataFrame(data)
@@ -762,14 +758,3 @@ def parse(date, output):
         click.echo(f"Error occurred while parsing: {e}")
 
     conn.close()
-
-while True:
-    try:
-        parse(["all"], None)  # Запускаем парсер
-        time.sleep(5)  # Ждем 5 секунд перед следующим запуском
-    except KeyboardInterrupt:
-        print("⏹ Остановка парсера...")
-        break  # Останавливаем цикл при нажатии Ctrl+C
-    except Exception as e:
-        print(f"⚠️ Ошибка в цикле парсинга: {e}")
-        time.sleep(5)  # Ждем 5 секунд перед новой попыткой
