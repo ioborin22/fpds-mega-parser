@@ -1,29 +1,32 @@
-from flask import Flask, jsonify, request
-import pandas as pd
+from flask import Flask, jsonify
+import mysql.connector
 
 app = Flask(__name__)
 
-# Загрузка данных из файла Parquet
-data = pd.read_parquet("/Users/iliaoborin/fpds/data/2011/09_09.parquet")
+def get_db_connection():
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            port=8889,
+            user='root',
+            password='root',
+            database='fpds'
+        )
+        print("Database connection established")
+        return conn
+    except mysql.connector.Error as e:
+        print(f"Database connection failed: {e}")
+        return None
 
-@app.route('/contracts', methods=['GET'])
-def get_contracts():
-    # Получаем piid из параметров запроса
-    piid = request.args.get('piid')
-
-    if not piid:
-        return jsonify({"error": "PIID parameter is required"}), 400
-
-    # Фильтрация данных по piid
-    filtered_data = data[data['piid'] == piid]
-
-    if filtered_data.empty:
-        return jsonify({"message": "No contracts found for the given PIID"}), 404
-
-    # Конвертация отфильтрованных данных в JSON
-    result = filtered_data.to_dict(orient="records")
-
-    return jsonify(result)
+@app.route('/')
+def test():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Failed to connect to the database"}), 500
+    else:
+        conn.close()
+        return jsonify({"success": "Connected to the database"}), 200
+        
 
 if __name__ == '__main__':
     app.run(debug=True)

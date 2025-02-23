@@ -625,8 +625,8 @@ def save_contracts_to_db(parsed_date, file_path):
         click.echo(f"📄 Successfully saved {saved_count} contracts out of {len(contracts)}")
 
         # Remove original JSON file
-        # os.remove(file_path)
-        # click.echo(f"🗑 Deleted JSON file: {file_path}")
+        os.remove(file_path)
+        click.echo(f"🗑 Deleted JSON file: {file_path}")
 
     except Exception as e:
         click.echo(f"⚠️ Contract parsing error: {e}")
