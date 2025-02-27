@@ -3,7 +3,7 @@
 import click
 
 from .parse import parse as _parse
-
+from .parse import parse_clickhouse as _parse_clickhouse
 
 @click.group()
 def cli():
@@ -14,3 +14,4 @@ def cli():
 
 
 cli.add_command(_parse)
+cli.add_command(_parse_clickhouse)

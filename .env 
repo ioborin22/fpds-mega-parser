@@ -1,10 +1,20 @@
-# Select DB type (mysql, postgresql, sqlite)
-DB_TYPE=mysql
+# Выбор типа БД (mysql, postgresql, sqlite, clickhouse)
+DB_TYPE=clickhouse
 
-DB_HOST=localhost
-DB_PORT=8889
-DB_NAME=fpds
-DB_USER=root
-DB_PASSWORD=root
+# Параметры MySQL (оставляем, если будем использовать)
+MYSQL_HOST=localhost
+MYSQL_PORT=8889
+MYSQL_NAME=fpds
+MYSQL_USER=root
+MYSQL_PASSWORD=root
 
+# Параметры ClickHouse
+CLICKHOUSE_HOST=localhost
+CLICKHOUSE_PORT=8123  # HTTP порт по умолчанию
+CLICKHOUSE_USER=root
+CLICKHOUSE_PASSWORD=root
+CLICKHOUSE_DB=fpds_clickhouse  # Название базы данных
+CLICKHOUSE_SECURE=false  # true, если используется HTTPS
+
+# Директория для хранения файлов (паркетов)
 DATA_DIR="/Users/iliaoborin/fpds/data/"

@@ -777,3 +777,104 @@ def parse(date, output):
         click.echo(f"Error occurred while parsing: {e}")
 
     conn.close()
+
+
+
+
+@click.command()
+@click.argument("date")
+def parse_clickhouse(date):
+    """
+    Парсит FPDS Atom feed и сохраняет JSON-контракты в ClickHouse.
+
+    Использование:
+        $ fpds parse clickhouse all
+    """
+    import clickhouse_connect
+
+    client = clickhouse_connect.get_client(host="localhost", port=8123, database="fpds_clickhouse")
+
+    conn = get_db_connection()
+    if conn is None:
+        click.echo("⚠️ Не удалось подключиться к MySQL.")
+        return
+
+    cursor = conn.cursor()
+
+    if date.lower() == "all":
+        click.echo("🔍 Определяем последнюю обработанную дату...")
+
+        cursor.execute("""
+            SELECT MAX(parsed_date) FROM parser_stage WHERE status = 'completed'
+        """)
+        last_parsed_date = cursor.fetchone()[0]
+
+        if last_parsed_date is None:
+            click.echo("⚠️ Нет завершённых записей. Начинаем с 1957-09-30.")
+            last_parsed_date = datetime(1957, 9, 30)  # Старт с 1957 года
+        else:
+            last_parsed_date = datetime.strptime(str(last_parsed_date), "%Y-%m-%d")
+
+        next_parsing_date = last_parsed_date + timedelta(days=1)
+        date = next_parsing_date.strftime("%Y/%m/%d")
+
+        click.echo(f"🚀 Начинаем парсинг с {date}")
+
+    while True:
+        year, month, day = date.split("/")
+        DATA_FILE = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
+
+        if not log_parsing_result(date, str(DATA_FILE), "pending"):
+            next_parsing_date = datetime.strptime(date, "%Y/%m/%d") + timedelta(days=1)
+            date = next_parsing_date.strftime("%Y/%m/%d")
+            year, month, day = date.split("/")
+            click.echo(f"🔄 Данные за {date} уже есть. Пробуем следующую дату...")
+            continue
+
+        break
+
+    formatted_date = f"SIGNED_DATE=[{date},{date}]"
+    params = [formatted_date.split("=")]
+
+    if not params:
+        raise UsageError("Пожалуйста, укажите хотя бы один параметр")
+
+    params_kwargs = dict(params)
+    click.echo(f"🔍 Параметры для FPDS: {params_kwargs}")
+
+    request = fpdsRequest(**params_kwargs, cli_run=True)
+    click.echo("🌐 Получаем записи FPDS...")
+
+    try:
+        data = asyncio.run(request.data())
+        records = list(chain.from_iterable(data))
+
+        DATA_DIR = Path(os.getenv("DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year)
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+        with open(DATA_FILE, "w") as outfile:
+            json.dump(records, outfile)
+
+        click.echo(f"📄 Сохранено {len(records)} записей в JSON: {DATA_FILE}")
+
+        if not records:
+            click.echo(f"⚠️ Нет данных за {date}. Пропускаем загрузку в ClickHouse.")
+            os.remove(DATA_FILE)
+            return
+
+        # Загружаем JSON в ClickHouse
+        batch = [(json.dumps(contract),) for contract in records]
+        client.insert("raw_contracts", batch, column_names=["raw"])
+
+        click.echo(f"✅ Загружено {len(batch)} контрактов в ClickHouse")
+
+        log_parsing_result(date, str(DATA_FILE), "completed", update=True)
+
+        os.remove(DATA_FILE)
+        click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
+
+    except Exception as e:
+        log_parsing_result(date, str(DATA_FILE), "failed", update=True)
+        click.echo(f"Ошибка при парсинге: {e}")
+
+    conn.close()
