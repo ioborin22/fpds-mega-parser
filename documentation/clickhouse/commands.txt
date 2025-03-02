@@ -1,0 +1,26 @@
+Количество записей в таблице
+SELECT count() FROM fpds_clickhouse.raw_contracts;
+
+Размер таблицы в МБ
+SELECT 
+    name, 
+    formatReadableSize(total_bytes) AS total_size
+FROM system.tables
+WHERE database = 'fpds_clickhouse' 
+AND name = 'raw_contracts';
+
+
+Просмотр структуры таблицы (колонки и их типы)
+DESCRIBE TABLE fpds_clickhouse.raw_contracts;
+
+Полное DDL-описание таблицы (включая сжатие и движок)
+SHOW CREATE TABLE fpds_clickhouse.raw_contracts;
+
+Чтобы удалить все записи из таблицы в ClickHouse, используйте команду:
+TRUNCATE TABLE fpds_clickhouse.raw_contracts;
+
+Если вам нужно удалить только определённые записи, используйте команду DELETE (если таблица поддерживает DELETE):
+DELETE FROM fpds_clickhouse.raw_contracts WHERE 1=1;
+
+Если тебе нужно просмотреть первые 50 записей данных из таблицы, используй:
+SELECT * FROM fpds_clickhouse.raw_contracts LIMIT 50;

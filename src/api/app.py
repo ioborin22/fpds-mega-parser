@@ -1,32 +1,25 @@
-from flask import Flask, jsonify
-import mysql.connector
+from fastapi import FastAPI
+import clickhouse_connect
 
-app = Flask(__name__)
+app = FastAPI()
+client = clickhouse_connect.get_client(host="localhost", port=8123)
 
-def get_db_connection():
-    try:
-        conn = mysql.connector.connect(
-            host='localhost',
-            port=8889,
-            user='root',
-            password='root',
-            database='fpds'
-        )
-        print("Database connection established")
-        return conn
-    except mysql.connector.Error as e:
-        print(f"Database connection failed: {e}")
-        return None
 
-@app.route('/')
-def test():
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "Failed to connect to the database"}), 500
-    else:
-        conn.close()
-        return jsonify({"success": "Connected to the database"}), 200
-        
+@app.get("/contract/{contract_id}")
+async def get_contract(contract_id: str):
+    query = f"SELECT * FROM fpds_clickhouse.raw_contracts WHERE id = toUUID('{contract_id}') LIMIT 1"
+    result = client.query(query)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    if not result.result_rows:
+        return {"error": "Not found"}
+
+    # Формируем словарь и убираем `None` значения
+    contract_data = dict(zip(result.column_names, result.result_rows[0]))
+    filtered_data = {key: value for key,
+                     value in contract_data.items() if value is not None}
+
+    return filtered_data
+
+# Запуск сервера:
+# uvicorn src.api.app:app --reload
+# http://127.0.0.1:8000/contract/474855fc-004e-4a25-8d08-bae1cfd27106

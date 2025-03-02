@@ -2,16 +2,31 @@
 
 import click
 
-from .parse import parse as _parse
-from .parse import parse_clickhouse as _parse_clickhouse
+# Импорт команд для парсинга
+from fpds.cli.parse_clickhouse import parse_clickhouse as _parse_clickhouse
+from fpds.cli.parse_sql import parse_sql as _parse_sql
+
 
 @click.group()
 def cli():
     """
-    CLI for parsing the FPDS ATOM feed found at
-    https://www.fpds.gov/fpdsng_cms/index.php/en/
+    CLI для парсинга данных FPDS.
+    Доступные команды:
+    - fpds parse clickhouse all
+    - fpds parse clickhouse YYYY/MM/DD [OPTIONS]
+    - fpds parse sql all
+    - fpds parse sql YYYY/MM/DD [OPTIONS]
     """
 
 
-cli.add_command(_parse)
-cli.add_command(_parse_clickhouse)
+@click.group()
+def parse():
+    """Группа команд `parse`"""
+
+
+# Добавляем подкоманды
+parse.add_command(_parse_clickhouse, name="clickhouse")
+parse.add_command(_parse_sql, name="sql")
+
+# Регистрируем команду `parse`
+cli.add_command(parse)
