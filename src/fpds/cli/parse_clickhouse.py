@@ -12,8 +12,7 @@ from fpds.cli.parts.utils import convert_bool
 from fpds.cli.parts.bool_fields import bool_fields
 # Импортируем функцию парсинга контракта
 from fpds.cli.parts.contract_parser import extract_contract_data
-
-from fpds.cli.parts.utils import process_dates
+from fpds.cli.parts.utils import log_missing_keys
 from fpds.cli.parts.utils import process_booleans
 
 from datetime import datetime, timedelta
@@ -179,6 +178,7 @@ def parse_clickhouse(date):
         # Вставляется src/fpds/cli/parts/columns.py
 
         for contract in records:
+ 
             signed_date = (
                 contract.get("content__award__relevantContractDates__signedDate")
                 or contract.get("content__IDV__relevantContractDates__signedDate")
@@ -188,15 +188,15 @@ def parse_clickhouse(date):
 
             partition_year = datetime.strptime(
                 signed_date, "%Y-%m-%d %H:%M:%S").year if signed_date else None
-
-            # 🔄 Преобразуем строковые значения дат в объекты `date`
-            contract = process_dates(contract)
-
+            
             # 🔄 Конвертируем булевые значения перед сохранением
             contract = process_booleans(contract, bool_fields)
 
             # 📦 Извлекаем и структурируем данные контракта перед вставкой в ClickHouse
             contract_data = extract_contract_data(contract, partition_year)
+
+            # 🔍 Логируем пропущенные переменные
+            log_missing_keys(contract, columns, DATA_FILE)
 
             batch.append(contract_data)
 
