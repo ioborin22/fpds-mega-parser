@@ -131,7 +131,7 @@ def parse_clickhouse(date):
         DATA_FILE = Path(os.getenv(
             "DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
 
-        if not log_parsing_result(date, str(DATA_FILE), "pending"):
+        if not log_parsing_result(date, str(DATA_FILE), "completed"):
             next_parsing_date = datetime.strptime(
                 date, "%Y/%m/%d") + timedelta(days=1)
             date = next_parsing_date.strftime("%Y/%m/%d")
@@ -208,8 +208,8 @@ def parse_clickhouse(date):
 
         log_parsing_result(date, str(DATA_FILE), "completed", update=True)
 
-        os.remove(DATA_FILE)
-        click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
+        # os.remove(DATA_FILE)
+        # click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
 
     except Exception as e:
         log_parsing_result(date, str(DATA_FILE), "failed", update=True)
