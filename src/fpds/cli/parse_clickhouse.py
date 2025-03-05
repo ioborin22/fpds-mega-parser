@@ -206,8 +206,6 @@ def parse_clickhouse(date):
 
                 batch.append(contract_data)
 
-
-
             # Вставка чанка в ClickHouse
             if batch:
                 client.insert("raw_contracts", batch, column_names=columns)
