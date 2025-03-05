@@ -3,7 +3,8 @@ import json
 import mysql.connector
 import click
 import os
-
+import time
+import sys
 # Импортируем список колонок для ClickHouse
 from fpds.cli.parts.columns import columns
 # Импортируем функцию `convert_bool`, которая конвертирует булевы значения ("true"/"false") в 1/0
@@ -89,15 +90,21 @@ def log_parsing_result(parsed_date, file_path, status, update=False):
 @click.argument("date")
 def parse_clickhouse(date):
     """
-    Парсит FPDS Atom feed и сохраняет JSON-контракты в ClickHouse.
+    Парсит FPDS Atom feed и сохраняет JSON-контракты в ClickHouse с разбиением на чанки.
 
     Использование:
         $ fpds parse clickhouse all
     """
     import clickhouse_connect
 
+    # ✅ Устанавливаем размер чанка
+    BATCH_SIZE = 1000
+    batch = []
+    total_inserted = 0
+
     client = clickhouse_connect.get_client(
-        host="localhost", port=8123, database="fpds_clickhouse")
+        host="localhost", port=8123, database="fpds_clickhouse"
+    )
 
     conn = get_db_connection()
     if conn is None:
@@ -173,46 +180,48 @@ def parse_clickhouse(date):
             os.remove(DATA_FILE)
             return
 
-        # Загружаем JSON в ClickHouse
-        batch = []
-        # Вставляется src/fpds/cli/parts/columns.py
+        # ✅ Загружаем JSON в ClickHouse чанками (по 5000 записей)
+        for i in range(0, len(records), BATCH_SIZE):
+            batch = []
 
-        for contract in records:
- 
-            signed_date = (
-                contract.get("content__award__relevantContractDates__signedDate")
-                or contract.get("content__IDV__relevantContractDates__signedDate")
-                or contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate")
-                or contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate")
-            )
+            for contract in records[i: i + BATCH_SIZE]:
+                signed_date = (
+                    contract.get("content__award__relevantContractDates__signedDate")
+                    or contract.get("content__IDV__relevantContractDates__signedDate")
+                    or contract.get("content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate")
+                    or contract.get("content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate")
+                )
 
-            partition_year = datetime.strptime(
-                signed_date, "%Y-%m-%d %H:%M:%S").year if signed_date else None
-            
-            # 🔄 Конвертируем булевые значения перед сохранением
-            contract = process_booleans(contract, bool_fields)
+                partition_year = datetime.strptime(
+                    signed_date, "%Y-%m-%d %H:%M:%S").year if signed_date else None
 
-            # 📦 Извлекаем и структурируем данные контракта перед вставкой в ClickHouse
-            contract_data = extract_contract_data(contract, partition_year)
+                # 🔄 Конвертируем булевые значения перед сохранением
+                contract = process_booleans(contract, bool_fields)
 
-            # 🔍 Логируем пропущенные переменные
-            log_missing_keys(contract, columns, DATA_FILE)
+                # 📦 Извлекаем и структурируем данные контракта перед вставкой в ClickHouse
+                contract_data = extract_contract_data(contract, partition_year)
 
-            batch.append(contract_data)
+                # 🔍 Логируем пропущенные переменные
+                log_missing_keys(contract, columns, DATA_FILE)
 
-        if batch:
-            client.insert("raw_contracts", batch, column_names=columns)
-            click.echo(f"✅ Загружено {len(batch)} контрактов в ClickHouse")
-        else:
-            click.echo("⚠️ Нет валидных данных для вставки.")
+                batch.append(contract_data)
+
+            # Вставка чанка в ClickHouse
+            if batch:
+                client.insert("raw_contracts", batch, column_names=columns)
+                total_inserted += len(batch)
+                sys.stdout.write(
+                    f"\r✅ Загружено {total_inserted} контрактов в ClickHouse")
+                sys.stdout.flush()
+
+                # Очищаем batch для следующей итерации
+                batch.clear()
+                time.sleep(1)
 
         log_parsing_result(date, str(DATA_FILE), "completed", update=True)
 
-        # os.remove(DATA_FILE)
-        # click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
-
     except Exception as e:
         log_parsing_result(date, str(DATA_FILE), "failed", update=True)
-        click.echo(f"Ошибка при парсинге: {e}")
+        click.echo(f"❌ Ошибка при парсинге: {e}")
 
     conn.close()
