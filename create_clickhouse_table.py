@@ -1,7 +1,7 @@
 from clickhouse_driver import Client
 
 # Подключение к ClickHouse
-client = Client(host='localhost', port=9000, user='default', password='', database='fpds_clickhouse')
+client = Client(host='localhost', port=9000, user='default', password='692607', database='fpds_clickhouse')
 
 # Удаление старой таблицы (если есть)
 client.execute("DROP TABLE IF EXISTS raw_contracts;")
