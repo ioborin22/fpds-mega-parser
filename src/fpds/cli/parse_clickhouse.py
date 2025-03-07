@@ -98,12 +98,17 @@ def parse_clickhouse(date):
     import clickhouse_connect
 
     # ✅ Устанавливаем размер чанка
-    BATCH_SIZE = 1000
+    BATCH_SIZE = 500
     batch = []
     total_inserted = 0
 
     client = clickhouse_connect.get_client(
-        host="localhost", port=8123, database="fpds_clickhouse"
+        host="localhost",
+        port=8123,
+        database="fpds_clickhouse",
+        username="default",
+        password="692607",
+        secure=False
     )
 
     conn = get_db_connection()
@@ -122,8 +127,8 @@ def parse_clickhouse(date):
         last_parsed_date = cursor.fetchone()[0]
 
         if last_parsed_date is None:
-            click.echo("⚠️ Нет завершённых записей. Начинаем с 1957-09-30.")
-            last_parsed_date = datetime(1957, 9, 30)  # Старт с 1957 года
+            click.echo("⚠️ Нет завершённых записей. Начинаем с 2005-01-01.")
+            last_parsed_date = datetime(2004, 12, 31)  # Старт с 2005 года
         else:
             last_parsed_date = datetime.strptime(
                 str(last_parsed_date), "%Y-%m-%d")
@@ -149,7 +154,7 @@ def parse_clickhouse(date):
 
         break
 
-    formatted_date = f"SIGNED_DATE=[{date},{date}]"
+    formatted_date = f"LAST_MOD_DATE=[{date},{date}]"
     params = [formatted_date.split("=")]
 
     if not params:
@@ -216,7 +221,10 @@ def parse_clickhouse(date):
 
                 # Очищаем batch для следующей итерации
                 batch.clear()
-                time.sleep(1)
+                time.sleep(2)
+                
+        os.remove(DATA_FILE)
+        click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
 
         log_parsing_result(date, str(DATA_FILE), "completed", update=True)
 

@@ -11,8 +11,8 @@ MYSQL_PASSWORD=root
 # Параметры ClickHouse
 CLICKHOUSE_HOST=localhost
 CLICKHOUSE_PORT=8123  # HTTP порт по умолчанию
-CLICKHOUSE_USER=root
-CLICKHOUSE_PASSWORD=root
+CLICKHOUSE_USER=default
+CLICKHOUSE_PASSWORD=692607
 CLICKHOUSE_DB=fpds_clickhouse  # Название базы данных
 CLICKHOUSE_SECURE=false  # true, если используется HTTPS
 
