@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 # Указываем путь к исходному JSON-файлу
-input_file = Path("/Users/iliaoborin/fpds/data/2005/01_03.json")
+input_file = Path("/Users/iliaoborin/fpds/data/2005/07_27.json")
 
 # Путь для сохранения найденного контракта
 output_file = input_file.with_name(f"{input_file.stem}_filtered.json")
@@ -41,4 +41,4 @@ def find_and_save_contract(input_path, output_path, target_key):
 
 # Запуск скрипта
 find_and_save_contract(input_file, output_file,
-                       "content__award__agencySpecificAwardElements__NASASpecificAwardElements__managementReportingRequirements")
+                       "content__IDV__agencySpecificIDVElements__NASASpecificIDVElements__alternateCOTRName")

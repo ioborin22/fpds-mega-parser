@@ -9,6 +9,11 @@ FROM system.tables
 WHERE database = 'fpds_clickhouse' 
 AND name = 'raw_contracts';
 
+Посчитать количество колонок в таблице
+SELECT count() 
+FROM system.columns 
+WHERE table = 'raw_contracts' 
+AND database = 'fpds_clickhouse';
 
 Просмотр структуры таблицы (колонки и их типы)
 DESCRIBE TABLE fpds_clickhouse.raw_contracts;
