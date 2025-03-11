@@ -45,7 +45,7 @@ def get_last_parsed_date():
 
     if last_parsed_record:
         return datetime.strptime(str(last_parsed_record[0]), "%Y-%m-%d"), last_parsed_record[1]
-    return datetime(2004, 12, 31), 'completed'  # Начинаем с 2005-01-01
+    return datetime(1957, 9, 30), 'completed'  # Начинаем с 1957-09-30
 
 
 def check_existing_file(date):
@@ -73,7 +73,7 @@ def check_existing_file(date):
 
 
 def fetch_fpds_data(date):
-    formatted_date = f"LAST_MOD_DATE=[{date},{date}]"
+    formatted_date = f"SIGNED_DATE=[{date},{date}]"
     params = dict([formatted_date.split("=")])
     request = fpdsRequest(**params, cli_run=True)
     print("🌐 Запрашиваем FPDS данные...")
@@ -178,9 +178,9 @@ def parse_clickhouse(date):
 
         if not data:
             click.echo(
-                f"⚠️ Нет данных за {last_parsed_date.strftime('%Y-%m-%d')}, ставим 'failed'")
+                f"⚠️ Нет данных за {last_parsed_date.strftime('%Y-%m-%d')}, ставим 'completed'")
             log_parsing_result(last_parsed_date.strftime(
-                '%Y-%m-%d'), str(file_path), "failed", update=True)
+                '%Y-%m-%d'), str(file_path), "completed", update=True)
             return
         
         # ✅ Генерируем путь к файлу перед сохранением
@@ -244,3 +244,9 @@ def parse_clickhouse(date):
         log_parsing_result(last_parsed_date.strftime(
             '%Y-%m-%d'), str(file_path), "completed", update=True)
         click.echo("✅ Данные успешно загружены в ClickHouse, статус 'completed'")
+
+        # year, month, day = date.split("/")
+        # DATA_FILE = Path(os.getenv(
+        #     "DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
+        # os.remove(DATA_FILE)
+        # click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")

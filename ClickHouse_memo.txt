@@ -1,0 +1,27 @@
+Запуск ClickHouse
+/opt/homebrew/Caskroom/clickhouse/25.2.1.3085-stable/clickhouse-macos-aarch64 server --daemon
+Посмотреть версию
+/opt/homebrew/bin/clickhouse --version
+Проверить, слушает ли сервер порты
+netstat -an | grep 8123
+
+🔍 Ты нашёл файлы базы fpds_clickhouse!
+/System/Volumes/Data/Users/iliaoborin/data/fpds_clickhouse
+/System/Volumes/Data/Users/iliaoborin/metadata/fpds_clickhouse
+/Users/iliaoborin/data/fpds_clickhouse
+/Users/iliaoborin/metadata/fpds_clickhouse
+
+
+Попробуй найти, какой процесс использует порт 8123:
+sudo lsof -i :8123
+
+Завершить процесс
+kill -9 <номер>
+
+Перезапустить ClickHouse с моим конфигом
+/opt/homebrew/Caskroom/clickhouse/25.2.1.3085-stable/clickhouse-macos-aarch64 server --config=/opt/homebrew/etc/clickhouse-server/config.xml --daemon
+
+
+Подключиться к ClickHouse
+clickhouse-client
+
