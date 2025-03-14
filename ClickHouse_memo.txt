@@ -1,7 +1,15 @@
 Запуск ClickHouse
-/opt/homebrew/Caskroom/clickhouse/25.2.1.3085-stable/clickhouse-macos-aarch64 server --daemon
+clickhouse-server --config=/Users/iliaoborin/clickhouse/25.2.1.3085-stable/preprocessed_configs/config.xml --daemon
+
+Выполни команду, чтобы найти PID (Process ID) сервера:
+ps aux | grep clickhouse
+
+Теперь убей процесс:
+kill -9 1856
+
 Посмотреть версию
-/opt/homebrew/bin/clickhouse --version
+clickhouse --version
+
 Проверить, слушает ли сервер порты
 netstat -an | grep 8123
 
@@ -23,5 +31,5 @@ kill -9 <номер>
 
 
 Подключиться к ClickHouse
-clickhouse-client
+clickhouse
 

@@ -200,9 +200,9 @@ def parse_clickhouse(date):
                 f"✅ Файл найден: {file_path}, продолжаем обработку и вставку в ClickHouse")
 
             # Запускаем обработку и вставку в ClickHouse
-            client = clickhouse_connect.get_client(
-                host="localhost", port=8123, database="fpds_clickhouse")
-            process_data_and_insert(file_path, client)
+            # client = clickhouse_connect.get_client(
+            # host="localhost", port=8123, database="fpds_clickhouse")
+            # process_data_and_insert(file_path, client)
 
             # Обновляем статус на 'completed'
             log_parsing_result(last_parsed_date.strftime(
@@ -231,14 +231,14 @@ def parse_clickhouse(date):
                     "❌ Повторное скачивание не дало результатов, остаётся 'failed'.")
                 return
 
-            # ✅ Генерируем путь к файлу перед сохранением
+            # ✅ Генерируем путь к файлу перед сохранением 
             file_path = generate_file_path(last_parsed_date.strftime('%Y/%m/%d'))
             save_data_to_file(data, file_path)
 
         # Запускаем обработку и вставку в ClickHouse
-        client = clickhouse_connect.get_client(
-            host="localhost", port=8123, database="fpds_clickhouse")
-        process_data_and_insert(file_path, client)
+         # client = clickhouse_connect.get_client(
+            # host="localhost", port=8123, database="fpds_clickhouse")
+         # process_data_and_insert(file_path, client)
 
         # Обновляем статус на 'completed'
         log_parsing_result(last_parsed_date.strftime(
