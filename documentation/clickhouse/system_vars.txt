@@ -1,0 +1,98 @@
+aggregate_function_combinators – Список доступных комбинаторов функций агрегирования (например, `-State`, `-Merge`).
+asynchronous_inserts – Текущие асинхронные вставки в ClickHouse.
+asynchronous_loader – Очередь асинхронной загрузки данных.
+asynchronous_metrics – Метрики, собираемые асинхронно.
+azure_queue – Очередь заданий, связанных с Azure.
+azure_queue_settings – Настройки очереди Azure.
+backups – Информация о резервных копиях, если используется механизм бэкапов.
+build_options – Опции сборки ClickHouse (например, поддерживаемые библиотеки и модули).
+certificates – Сертификаты, используемые для TLS/SSL соединений.
+clusters – Информация о кластерах ClickHouse.
+collations – Список поддерживаемых правил сортировки (collations).
+columns – Информация о колонках всех таблиц ClickHouse.
+contributors – Информация о разработчиках ClickHouse (вероятно, список коммитов).
+current_roles – Роли, активные для текущего пользователя.
+dashboards – Данные о встроенных или сторонних дашбордах.
+data_skipping_indices – Индексы, используемые для пропуска данных при запросах.
+data_type_families – Список поддерживаемых семейств типов данных.
+database_engines – Доступные движки баз данных (например, Atomic, Ordinary).
+databases – Список всех баз данных в ClickHouse.
+detached_parts – Отключенные (detached) партиции, которые могут быть восстановлены.
+detached_tables – Отключенные таблицы (например, после удаления или потери данных).
+dictionaries – Информация о всех словарях (external dictionaries) в ClickHouse.
+disks – Доступные диски для хранения данных (например, SSD, HDD, S3).
+distributed_ddl_queue – Очередь распределенных DDL-операций (например, `CREATE TABLE` в кластере).
+distribution_queue – Очередь задач распределения данных.
+dns_cache – Кэш DNS-запросов, используемый сервером ClickHouse.
+dropped_tables – Удаленные таблицы, которые можно восстановить.
+dropped_tables_parts – Части удаленных таблиц.
+enabled_roles – Роли, активированные для текущего пользователя.
+errors – Ошибки, зафиксированные в системе ClickHouse.
+events – Информация о событиях, происходящих в ClickHouse (например, завершение запросов).
+filesystem_cache – Кэш файловой системы для ClickHouse.
+filesystem_cache_settings – Настройки кэша файловой системы.
+formats – Поддерживаемые форматы ввода/вывода данных (например, JSON, Parquet, CSV).
+functions – Доступные функции в ClickHouse (встроенные и пользовательские).
+grants – Выданные привилегии (например, `GRANT SELECT ON table`).
+graphite_retentions – Настройки ретенции (удаления старых данных) в Graphite.
+jemalloc_bins – Статистика выделения памяти, если ClickHouse использует jemalloc.
+kafka_consumers – Информация о потребителях Kafka в ClickHouse.
+keywords – Зарезервированные ключевые слова SQL в ClickHouse.
+latency_buckets – Статистика по задержкам выполнения запросов.
+licenses – Лицензии, используемые в ClickHouse (например, Apache 2.0).
+macros – Определенные макросы для упрощения конфигурации ClickHouse.
+merge_tree_settings – Настройки таблиц на движке MergeTree.
+merges – Текущие операции слияния данных в таблицах MergeTree.
+metrics – Метрики производительности ClickHouse.
+models – Информация о загруженных ML-моделях, если используется ML-интеграция.
+moves – Операции перемещения данных между дисками/разделами.
+mutations – Текущие мутации в таблицах ClickHouse (например, `DELETE` или `UPDATE`).
+named_collections – Определенные именованные коллекции настроек.
+numbers – Виртуальная таблица, содержащая последовательность чисел.
+numbers_mt – То же, что и `numbers`, но с движком MergeTree.
+one – Таблица-заглушка, возвращает единичное значение "1", полезно для тестов.
+part_moves_between_shards – Информация о перемещении частей таблиц между шардов.
+parts – Информация о частях (партициях) таблиц MergeTree.
+parts_columns – Информация о столбцах внутри частей таблиц MergeTree.
+privileges – Список привилегий, назначенных пользователям и ролям.
+processes – Активные запросы, выполняемые в данный момент в ClickHouse.
+projection_parts – Информация о проекциях (оптимизированные представления) таблиц MergeTree.
+projection_parts_columns – Данные о столбцах внутри проекций таблиц MergeTree.
+projections – Описание существующих проекций в таблицах MergeTree.
+query_cache – Кэш SQL-запросов, если он включен.
+quota_limits – Лимиты квот, применяемые к пользователям.
+quota_usage – Использование квот пользователями.
+quotas – Определенные квоты для пользователей (например, ограничения на количество запросов).
+quotas_usage – Использование квот пользователями.
+remote_data_paths – Пути к удаленным данным для хранения данных на удаленных серверах.
+replicas – Информация о репликах таблиц ReplicatedMergeTree.
+replicated_fetches – Операции репликации, выполняемые в данный момент.
+replicated_merge_tree_settings – Настройки таблиц ReplicatedMergeTree.
+replication_queue – Очередь операций репликации для таблиц ReplicatedMergeTree.
+resources – Данные о доступных ресурсах (например, дисковое пространство).
+rocksdb – Информация о встроенной RocksDB, если используется.
+role_grants – Назначенные роли пользователям.
+roles – Определенные роли в системе управления доступом ClickHouse.
+row_policies – Определенные политики строкового уровня для пользователей.
+s3_queue_settings – Очередь операций, выполняемых в S3-хранилище.
+s3queue – Очередь задач, связанных с S3.
+scheduler – Планировщик задач ClickHouse.
+schema_inference_cache – Кэш определения схемы данных.
+server_settings – Текущие настройки сервера ClickHouse.
+settings – Глобальные настройки сервера ClickHouse.
+settings_changes – История изменений настроек ClickHouse.
+settings_profile_elements – Элементы профилей настроек.
+settings_profiles – Определенные профили настроек.
+storage_policies – Политики хранения данных на различных устройствах.
+table_engines – Доступные движки таблиц (например, MergeTree, Log).
+table_functions – Доступные табличные функции (например, `numbers()`, `s3()`).
+tables – Информация о существующих таблицах в ClickHouse.
+time_zones – Список поддерживаемых часовых поясов.
+user_directories – Директории пользователей и их настройки.
+user_processes – Запущенные процессы пользователей.
+users – Определенные пользователи в системе.
+view_refreshes – Обновления материализованных представлений.
+warnings – Последние предупреждения в системе.
+workloads – Информация о нагрузке на сервер.
+zeros – Таблица-заглушка, генерирующая только нули.
+zeros_mt – То же, что и `zeros`, но с движком MergeTree.

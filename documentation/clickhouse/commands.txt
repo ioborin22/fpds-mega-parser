@@ -29,3 +29,78 @@ DELETE FROM fpds_clickhouse.raw_contracts WHERE 1=1;
 
 Если тебе нужно просмотреть первые 50 записей данных из таблицы, используй:
 SELECT * FROM fpds_clickhouse.raw_contracts LIMIT 50;
+
+Сбросить
+UPDATE file_processing_status 
+SET status = 'file_found', inserted_records = 0;
+
+
+УДАЛЕНИЯ ЗА ДЕНЬ
+
+Шаг 1: Посчитать количество записей за 1979-04-15
+SELECT COUNT(*)
+FROM fpds_clickhouse.raw_contracts
+WHERE 
+    toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15';
+
+Удалить все сразу - зависает
+ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
+WHERE partition_year = 1979 
+AND (
+    toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+);
+
+Удалить 3000 записей
+ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
+WHERE id IN (
+    SELECT id
+    FROM fpds_clickhouse.raw_contracts
+    WHERE 
+        toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
+        OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
+        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+    LIMIT 3000
+);
+
+Удалить 3000 записей по партишен году - зависает
+ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
+WHERE partition_year = 1979 
+AND id IN (
+    SELECT id
+    FROM fpds_clickhouse.raw_contracts
+    WHERE 
+        partition_year = 1979
+        AND (
+            toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
+            OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
+            OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+            OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
+        )
+    LIMIT 3000
+);
+
+🔴 Важное замечание:
+В ClickHouse DELETE не удаляет мгновенно, а помечает записи для удаления. Чтобы очистить физически, выполни:
+
+OPTIMIZE TABLE fpds_clickhouse.raw_contracts FINAL;
+
+Чтобы не нагружать сервер, лучше делать оптимизацию по партициям:
+OPTIMIZE TABLE fpds_clickhouse.raw_contracts PARTITION 1979 FINAL;
+
+Проверяем текущие мутации
+SELECT database, table, mutation_id, command, is_done, is_killed
+FROM system.mutations
+WHERE table = 'raw_contracts' AND database = 'fpds_clickhouse';
+
+
+ЗАПУСК ВСТАВКИ В ClickHouse
+cd fpds
+source venv/bin/activate        
+python insert_json_clickhouse.py
