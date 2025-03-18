@@ -88,3 +88,4 @@ async def delete_all_mutations():
 # Запуск сервера:
 # uvicorn src.api.app:app --reload
 # http://127.0.0.1:8000/contract/474855fc-004e-4a25-8d08-bae1cfd27106
+# http://127.0.0.1:8000/mutations

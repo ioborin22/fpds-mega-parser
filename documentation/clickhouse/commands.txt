@@ -37,14 +37,26 @@ SET status = 'file_found', inserted_records = 0;
 
 УДАЛЕНИЯ ЗА ДЕНЬ
 
-Шаг 1: Посчитать количество записей за 1979-04-15
+Шаг 1: Посчитать количество записей за 1980-02-15
 SELECT COUNT(*)
 FROM fpds_clickhouse.raw_contracts
 WHERE 
-    toDate(content__award__relevantContractDates__signedDate) = '1979-12-15'
-    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-12-15'
-    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
-    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-12-15';
+    toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
+    OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
+    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15';
+
+Посчитать количество записей за дату + партиция
+SELECT COUNT(*)
+FROM fpds_clickhouse.raw_contracts
+WHERE 
+    partition_year = 1980
+    AND (
+        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+    );
 
 
 Удалить 1000 записей
@@ -53,10 +65,25 @@ WHERE id IN (
     SELECT id
     FROM fpds_clickhouse.raw_contracts
     WHERE 
-        toDate(content__award__relevantContractDates__signedDate) = '1979-12-15'
-        OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-12-15'
-        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
-        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
+        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+    LIMIT 1000
+);
+
+Удалить 1000 записей + партиция
+ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
+WHERE partition_year = 1980
+AND id IN (
+    SELECT id FROM fpds_clickhouse.raw_contracts
+    WHERE partition_year = 1980
+    AND (
+        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
+    )
     LIMIT 1000
 );
 
@@ -85,3 +112,8 @@ find . -name 'mutation_*.txt'
 
 Найти и удалить все мутации
 find ./data/store -name 'mutation_*.txt' -delete
+
+Посчитать колличество записей за партицию
+SELECT COUNT(*) 
+FROM fpds_clickhouse.raw_contracts 
+WHERE partition_year = 1979;
