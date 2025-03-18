@@ -41,49 +41,23 @@ SET status = 'file_found', inserted_records = 0;
 SELECT COUNT(*)
 FROM fpds_clickhouse.raw_contracts
 WHERE 
-    toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15';
+    toDate(content__award__relevantContractDates__signedDate) = '1979-12-15'
+    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-12-15'
+    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
+    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-12-15';
 
-Удалить все сразу - зависает
-ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
-WHERE partition_year = 1979 
-AND (
-    toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-);
 
-Удалить 3000 записей
+Удалить 1000 записей
 ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
 WHERE id IN (
     SELECT id
     FROM fpds_clickhouse.raw_contracts
     WHERE 
-        toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
-        OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
-        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-    LIMIT 3000
-);
-
-Удалить 3000 записей по партишен году - зависает
-ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
-WHERE partition_year = 1979 
-AND id IN (
-    SELECT id
-    FROM fpds_clickhouse.raw_contracts
-    WHERE 
-        partition_year = 1979
-        AND (
-            toDate(content__award__relevantContractDates__signedDate) = '1979-07-15'
-            OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-07-15'
-            OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-            OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-07-15'
-        )
-    LIMIT 3000
+        toDate(content__award__relevantContractDates__signedDate) = '1979-12-15'
+        OR toDate(content__IDV__relevantContractDates__signedDate) = '1979-12-15'
+        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
+        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1979-12-15'
+    LIMIT 1000
 );
 
 🔴 Важное замечание:
@@ -104,3 +78,10 @@ WHERE table = 'raw_contracts' AND database = 'fpds_clickhouse';
 cd fpds
 source venv/bin/activate        
 python insert_json_clickhouse.py
+
+
+Найди все файлы мутаций:
+find . -name 'mutation_*.txt'
+
+Найти и удалить все мутации
+find ./data/store -name 'mutation_*.txt' -delete
