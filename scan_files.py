@@ -7,7 +7,7 @@ from datetime import datetime
 from fpds.config import DB_CONFIG  # Используем конфиг для подключения к MySQL
 
 # Путь к папке с файлами
-DATA_DIR = Path("/Volumes/Storage01/data")
+DATA_DIR = Path("/Volumes/T7/data")
 
 # Статусы файлов
 STATUS_FILE_MISSING = "file_missing"

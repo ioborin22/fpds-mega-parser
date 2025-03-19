@@ -65,7 +65,7 @@ BATCH_SIZE = 1000  # Количество записей в батче
 print("🔄 Проверяем подключение к ClickHouse...")
 try:
     client = clickhouse_connect.get_client(
-        host="localhost", port=8123, database="fpds_clickhouse", settings={"async_insert": 1, "wait_for_async_insert": 1, "max_memory_usage": 4294967296}
+        host="localhost", port=8123, database="fpds_clickhouse"
     )
     print("✅ Подключение успешно!")
 except Exception as e:
@@ -203,9 +203,12 @@ def process_data_and_insert(file_data):
         if batch:
             # 🔹 Вставка в ClickHouse
             client.insert("raw_contracts", batch, column_names=columns)
-            restart_clickhouse()
+            # restart_clickhouse()
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
+            # 🔄 Очистка памяти ClickHouse
+            client.query("SYSTEM DROP UNCOMPRESSED CACHE")
+            client.query("SYSTEM DROP MARK CACHE")
             gc.collect()
             time.sleep(3)  # Предотвращаем перегрузку
 

@@ -1,6 +1,9 @@
 Количество записей в таблице
 SELECT count() FROM fpds_clickhouse.raw_contracts;
 
+Сравнить в MySQL
+SELECT SUM(inserted_records) AS total_inserted_records FROM file_processing_status; 
+
 Размер таблицы в МБ
 SELECT 
     name, 
