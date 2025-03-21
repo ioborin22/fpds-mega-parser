@@ -10,52 +10,6 @@ from fpds.cli.parts.contract_parser import extract_contract_data
 from fpds.cli.parts.columns import columns
 from fpds.cli.parts.bool_fields import bool_fields
 from fpds.config import DB_CONFIG
-import subprocess
-
-
-def restart_clickhouse():
-    print("🛑 Останавливаем ClickHouse...")
-
-    # 🔹 Принудительная остановка сервера
-    try:
-        subprocess.run(["pkill", "-9", "clickhouse"], check=False)
-        print("✅ ClickHouse остановлен.")
-    except Exception as e:
-        print(f"⚠️ Ошибка при остановке ClickHouse: {e}")
-
-    print("⏳ Ждем 5 секунд для завершения всех процессов...")
-    time.sleep(5)
-
-    print("🚀 Запускаем ClickHouse снова...")
-    try:
-        subprocess.run([
-            "/Users/iliaoborin/clickhouse/25.2.1.3085-stable/clickhouse-macos-aarch64",
-            "server",
-            "--config=/Users/iliaoborin/clickhouse/25.2.1.3085-stable/preprocessed_configs/config.xml",
-            "--daemon"
-        ], check=True)
-        print("✅ ClickHouse запущен в фоновом режиме.")
-    except Exception as e:
-        print(f"❌ Ошибка при запуске ClickHouse: {e}")
-        return
-
-    print("⏳ Ждем 10 секунд, чтобы ClickHouse успел подняться...")
-    time.sleep(10)
-
-    # 🔹 Проверяем, доступен ли ClickHouse после перезапуска
-    try:
-        result = subprocess.run([
-            "/Users/iliaoborin/clickhouse/25.2.1.3085-stable/clickhouse-macos-aarch64",
-            "client", "--query", "SELECT 1"
-        ], check=True, capture_output=True, text=True)
-
-        if result.stdout.strip() == "1":
-            print("✅ ClickHouse успешно запущен и доступен!")
-        else:
-            print("❌ ClickHouse запущен, но не отвечает корректно!")
-
-    except Exception as e:
-        print(f"❌ Ошибка подключения к ClickHouse после перезапуска: {e}")
 
 
 # 📌 Настройки
@@ -91,7 +45,7 @@ def get_next_file():
     cursor = conn.cursor(dictionary=True)
     query = """
     SELECT id, signed_date, record_count, inserted_records, file_path, status
-    FROM file_processing_status
+    FROM insert_json_clickhouse
     WHERE status = 'file_found'
     ORDER BY signed_date ASC
     LIMIT 1;
@@ -115,7 +69,7 @@ def update_status(file_id, status, inserted_records=0):
 
     cursor = conn.cursor()
     query = """
-    UPDATE file_processing_status
+    UPDATE insert_json_clickhouse
     SET status = %s, inserted_records = %s, updated_at = NOW()
     WHERE id = %s;
     """
@@ -164,26 +118,29 @@ def process_data_and_insert(file_data):
             contract = {k: v for k, v in contract.items()
                         if k in columns or str(v).strip()}  # Удаляем пустые значения
 
-            # Определяем `partition_year`
+            # Определяем год, месяц, день
             signed_date_keys = [
                 "content__award__relevantContractDates__signedDate",
                 "content__IDV__relevantContractDates__signedDate",
                 "content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate",
                 "content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate",
             ]
-            signed_date = next((contract.get(k)
-                               for k in signed_date_keys if k in contract), None)
+            signed_date = next((contract[k] for k in signed_date_keys if k in contract and contract[k]), None)
             if not signed_date:
                 raise ValueError(
                     f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
-            partition_year = int(signed_date[:4])  # Берем год
-
+            # Разбиваем строку даты "YYYY-MM-DD HH:MM:SS" и извлекаем значения
+            date_parts = signed_date.split(" ")[0].split("-")  # Берём только "YYYY-MM-DD"
+            partition_year = int(date_parts[0])
+            partition_month = int(date_parts[1])
+            partition_day = int(date_parts[2])
             # 🔄 Преобразуем булевы значения
             contract = process_booleans(contract, bool_fields)
 
             # 📦 Формируем данные
-            contract_data = extract_contract_data(contract, partition_year)
+            contract_data = extract_contract_data(
+                contract, partition_year, partition_month, partition_day)
 
             # 📌 Переменные, которые нужно пропустить
             excluded_keys = {
@@ -203,12 +160,8 @@ def process_data_and_insert(file_data):
         if batch:
             # 🔹 Вставка в ClickHouse
             client.insert("raw_contracts", batch, column_names=columns)
-            # restart_clickhouse()
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
-            # 🔄 Очистка памяти ClickHouse
-            client.query("SYSTEM DROP UNCOMPRESSED CACHE")
-            client.query("SYSTEM DROP MARK CACHE")
             gc.collect()
             time.sleep(3)  # Предотвращаем перегрузку
 
@@ -230,9 +183,9 @@ def process_data_and_insert(file_data):
 
 # 🔄 Запуск
 if __name__ == "__main__":
-    while True:
-        file_data = get_next_file()
-        if not file_data:
-            print("🎉 Все файлы обработаны!")
-            break
+    file_data = get_next_file()
+
+    if file_data:
         process_data_and_insert(file_data)
+    else:
+        print("🎉 Нет файлов для обработки. Завершение работы.")

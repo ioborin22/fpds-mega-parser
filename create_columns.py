@@ -7,7 +7,8 @@ output_file = Path("/Users/iliaoborin/fpds/src/fpds/cli/parts/columns.py")
 
 # Переменные, которые **обязательно** должны быть добавлены
 extra_fields = {
-    "partition_year", "title", "contract_type", "link__rel", "link__type", "link__href", "modified", "content__type"
+    "partition_year", "partition_month", "partition_day",
+    "title", "contract_type", "link__rel", "link__type", "link__href", "modified", "content__type"
 }
 
 # Регулярное выражение для поиска колонок

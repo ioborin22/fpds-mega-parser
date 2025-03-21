@@ -14,7 +14,8 @@ special_fields = {
 
 # Переменные, которые **обязательно** должны быть в начале списка
 extra_fields = [
-    "partition_year", "title", "contract_type", "link__rel", "link__type", "link__href", "modified"
+    "partition_year", "partition_month", "partition_day",
+    "title", "contract_type", "link__rel", "link__type", "link__href", "modified"
 ]
 
 # Регулярное выражение для поиска переменных
@@ -36,14 +37,17 @@ with open(schema_file, "r", encoding="utf-8") as file:
 columns = extra_fields + [col for col in columns if col not in extra_fields]
 
 # Генерируем содержимое файла contract_parser.py
-parser_text = """def extract_contract_data(contract, partition_year):
+parser_text = """def extract_contract_data(contract, partition_year, partition_month, partition_day):
     return [
         partition_year,
+        partition_month,
+        partition_day,
 """
 
-for col in columns[1:]:  # Первый элемент — partition_year, он уже добавлен вручную
+# Первые три элемента (partition_year, partition_month, partition_day) уже добавлены вручную
+for col in columns[3:]:
     col_name = special_fields.get(col, col)  # Подменяем, если в special_fields
-    parser_text += f'        contract.get("{col_name}"),\n'
+    parser_text += f'        contract.get("{col_name}", None),\n'
 
 parser_text += "    ]\n"
 

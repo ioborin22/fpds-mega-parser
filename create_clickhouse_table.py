@@ -1,11 +1,16 @@
 from clickhouse_driver import Client
 
+# ANSI escape-коды для цветов
+RED = "\033[91m"   # Красный
+GREEN = "\033[92m"  # Зелёный
+RESET = "\033[0m"  # Сброс цвета
+
 # Подключение к ClickHouse
 client = Client(host='localhost', port=9000, user='default', password='', database='fpds_clickhouse')
 
 # Удаление старой таблицы (если есть)
 client.execute("DROP TABLE IF EXISTS raw_contracts;")
-print("Таблица raw_contracts удалена.")
+print(f"{RED}Таблица raw_contracts удалена.{RESET}")  # 🔴 Красный текст
 
 # Создание новой таблицы
 client.execute("""
@@ -15,6 +20,8 @@ CREATE TABLE raw_contracts (
     
     id UUID DEFAULT generateUUIDv4() COMMENT 'Unique identifier for each award' CODEC(ZSTD(1)),
     partition_year UInt16 DEFAULT 0 COMMENT 'Year used for partitioning' CODEC(ZSTD(1)),
+    partition_month UInt16 DEFAULT 0 COMMENT 'Month used for partitioning' CODEC(ZSTD(1)),
+    partition_day UInt16 DEFAULT 0 COMMENT 'Day used for partitioning' CODEC(ZSTD(1)),
     title Nullable(String) DEFAULT NULL COMMENT 'Title of the award, including contract number and vendor name' CODEC(ZSTD(3)),
     contract_type Nullable(Enum8('AWARD' = 1, 'IDV' = 2, 'OTHERTRANSACTIONAWARD' = 3, 'OTHERTRANSACTIONIDV' = 4)) DEFAULT NULL COMMENT 'The type of contract' CODEC(T64),
     link__rel Nullable(String) DEFAULT NULL COMMENT 'Relation type of the link (e.g., alternate)' CODEC(ZSTD(3)),
@@ -1085,7 +1092,7 @@ CREATE TABLE raw_contracts (
 
 ) ENGINE = MergeTree()
 ORDER BY id
-PARTITION BY partition_year;
+PARTITION BY (partition_year, partition_month, partition_day)
 """)
 
-print("Новая таблица raw_contracts создана!")
+print(f"{GREEN}Новая таблица raw_contracts создана!{RESET}")  # 🟢 Зелёный текст
