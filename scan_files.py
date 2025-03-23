@@ -26,7 +26,7 @@ def get_db_connection():
 def file_exists_in_db(cursor, signed_date):
     """Проверяет, есть ли запись в БД для данной даты."""
     query = """
-    SELECT COUNT(*) FROM file_processing_status WHERE signed_date = %s;
+    SELECT COUNT(*) FROM insert_json_clickhouse WHERE signed_date = %s;
     """
     cursor.execute(query, (signed_date,))
     return cursor.fetchone()[0] > 0
@@ -74,7 +74,7 @@ def scan_and_insert_files():
 
                 # Добавляем запись в БД
                 query = """
-                INSERT INTO file_processing_status (signed_date, record_count, file_size_bytes, file_path, status)
+                INSERT INTO insert_json_clickhouse (signed_date, record_count, file_size_bytes, file_path, status)
                 VALUES (%s, %s, %s, %s, %s);
                 """
                 cursor.execute(query, (signed_date, record_count,
