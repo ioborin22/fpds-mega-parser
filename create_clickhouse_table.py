@@ -325,7 +325,7 @@ CREATE TABLE raw_contracts (
     content__award__transactionInformation__lastModifiedDate Nullable(String) DEFAULT NULL COMMENT 'Date and time when the transaction was last modified' CODEC(ZSTD(3)),
     content__award__transactionInformation__status Nullable(String) DEFAULT NULL COMMENT 'Status of the transaction' CODEC(ZSTD(3)),
     content__award__transactionInformation__status__description Nullable(String) DEFAULT NULL COMMENT 'Description of the transaction status' CODEC(ZSTD(3)),
-    content__award__agencySpecificAwardElements__agencyID Nullable(String) DEFAULT NULL COMMENT '' CODEC(ZSTD(3)),
+    content__award__agencySpecificAwardElements__agencyID Nullable(String) DEFAULT NULL COMMENT 'Agency-specific identifier for the award' CODEC(ZSTD(3)),
     
     content__award__agencySpecificAwardElements__NASASpecificAwardElements__offerorsProposalNumber Nullable(String) DEFAULT NULL COMMENT 'Offerors Proposal Number for NASA Specific Award Element' CODEC(ZSTD(3)),
     content__award__agencySpecificAwardElements__NASASpecificAwardElements__PRNumber Nullable(String) DEFAULT NULL COMMENT 'NASA Specific Award Element: PR Number' CODEC(ZSTD(3)),
@@ -365,7 +365,8 @@ CREATE TABLE raw_contracts (
     content__award__agencySpecificAwardElements__NASASpecificAwardElements__otherStatutoryAuthority Nullable(String) DEFAULT NULL COMMENT 'Other statutory authority related to NASA award' CODEC(ZSTD(3)),
     content__award__agencySpecificAwardElements__NASASpecificAwardElements__finalInvoicePaidDate Nullable(String) DEFAULT NULL COMMENT 'Date when the final invoice was paid' CODEC(ZSTD(3)),
     content__award__agencySpecificAwardElements__NASASpecificAwardElements__accountingInstallationNumber Nullable(String) DEFAULT NULL COMMENT 'NASA Specific Award Element: Accounting Installation Number' CODEC(ZSTD(3)),    
-    
+    content__award__agencySpecificAwardElements__NASASpecificAwardElements__nonFederalFundingAmount Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'NASA Non-Federal Funding Amount' CODEC(ZSTD(3)),
+               
     content__award__transactionInformation__approvedBy Nullable(String) DEFAULT NULL COMMENT 'User who approved the transaction' CODEC(ZSTD(3)),
     content__award__transactionInformation__approvedDate Nullable(String) DEFAULT NULL COMMENT 'Date and time when the transaction was approved' CODEC(ZSTD(3)),
     content__award__transactionInformation__closedBy Nullable(String) DEFAULT NULL COMMENT 'User or entity that closed the transaction' CODEC(ZSTD(3)),
@@ -381,6 +382,10 @@ CREATE TABLE raw_contracts (
     content__award__genericTags__genericStrings__genericString08 Nullable(String) DEFAULT NULL COMMENT 'Generic tag string 08' CODEC(ZSTD(3)),
     content__award__genericTags__genericStrings__genericString09 Nullable(String) DEFAULT NULL COMMENT 'Generic tag string 09' CODEC(ZSTD(3)),
     content__award__genericTags__genericStrings__genericString10 Nullable(String) DEFAULT NULL COMMENT 'Generic tag string 10' CODEC(ZSTD(3)),
+    content__award__genericTags__genericBooleans__genericBoolean01 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic Boolean 1' CODEC(ZSTD(3)),
+    content__award__genericTags__genericBooleans__genericBoolean02 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic Boolean 2' CODEC(ZSTD(3)),
+    content__award__genericTags__genericBooleans__genericBoolean03 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic Boolean 3' CODEC(ZSTD(3)),
+    content__award__genericTags__genericBooleans__genericBoolean04 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic Boolean 4' CODEC(ZSTD(3)),
                
     -- IDV Content Data
 
@@ -417,6 +422,7 @@ CREATE TABLE raw_contracts (
     content__IDV__purchaserInformation__fundingRequestingOfficeID__name Nullable(String) DEFAULT NULL COMMENT 'Funding requesting office name' CODEC(ZSTD(3)),
     content__IDV__purchaserInformation__foreignFunding Nullable(String) DEFAULT NULL COMMENT 'Indicates if foreign funding is involved (X means not applicable)' CODEC(ZSTD(3)),
     content__IDV__purchaserInformation__foreignFunding__description Nullable(String) DEFAULT NULL COMMENT 'Description of foreign funding status' CODEC(ZSTD(3)),
+    content__IDV__contractMarketingData__emailAddress Nullable(String) DEFAULT NULL COMMENT 'Email address for the contract marketing data' CODEC(ZSTD(3)),
     content__IDV__contractMarketingData__websiteURL Nullable(String) DEFAULT NULL COMMENT 'Website URL for the contract marketing data' CODEC(ZSTD(3)),
     content__IDV__contractMarketingData__whoCanUse Nullable(String) DEFAULT NULL COMMENT 'Who can use the contract' CODEC(ZSTD(3)),
     content__IDV__contractMarketingData__individualOrderLimit Nullable(String) DEFAULT NULL COMMENT 'Individual order limit for the contract' CODEC(ZSTD(3)),
