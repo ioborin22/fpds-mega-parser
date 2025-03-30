@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📊 FPDS Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { margin-top: 30px; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>📅 FPDS Контракты по датам</h1>
+
+    {% for year, dates in grouped_data.items() %}
+        <h2>{{ year }}</h2>
+        <ul>
+            {% for item in dates %}
+                <li>{{ item.date }} — {{ item.count }} контрактов</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>

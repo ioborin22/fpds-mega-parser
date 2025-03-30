@@ -33,6 +33,14 @@ DELETE FROM fpds_clickhouse.raw_contracts WHERE 1=1;
 Если тебе нужно просмотреть первые 50 записей данных из таблицы, используй:
 SELECT * FROM fpds_clickhouse.raw_contracts LIMIT 50;
 
+Посмотреть сколько записей за каждый год
+SELECT 
+    partition_year, 
+    count(*) AS records
+FROM fpds_clickhouse.raw_contracts
+GROUP BY partition_year
+ORDER BY partition_year;
+
 Сбросить
 UPDATE file_processing_status 
 SET status = 'file_found', inserted_records = 0;

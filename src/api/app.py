@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 import clickhouse_connect
 
+from fastapi import Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="/Users/iliaoborin/fpds/src/templates")
+
 app = FastAPI()
 client = clickhouse_connect.get_client(host="localhost", port=8123)
 
@@ -83,6 +89,38 @@ async def delete_all_mutations():
         return {"status": "success", "message": "All mutations deleted."}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    
+
+@app.get("/fpds", response_class=HTMLResponse)
+async def fpds_dashboard(request: Request):
+    query = """
+    SELECT 
+        partition_year, 
+        partition_month, 
+        partition_day, 
+        COUNT(*) as count
+    FROM fpds_clickhouse.raw_contracts
+    GROUP BY partition_year, partition_month, partition_day
+    ORDER BY partition_year, partition_month, partition_day
+    """
+    result = client.query(query)
+
+    # Группируем по годам → год -> [ { date, count }, ... ]
+    grouped = {}
+    for row in result.result_rows:
+        year, month, day, count = row
+        date_str = f"{year:04d}-{month:02d}-{day:02d}"
+        if year not in grouped:
+            grouped[year] = []
+        grouped[year].append({
+            "date": date_str,
+            "count": count
+        })
+
+    return templates.TemplateResponse("main.html", {
+        "request": request,
+        "grouped_data": grouped
+    })
 
 
 # Запуск сервера:

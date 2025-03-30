@@ -12,6 +12,36 @@ from fpds.cli.parts.bool_fields import bool_fields
 from fpds.config import DB_CONFIG
 
 
+def insert_batch_with_retry(client, table, batch, columns, initial_wait=10, wait_increment=10):
+    """
+    Пытается вставить данные в ClickHouse. Если возникает ошибка MEMORY_LIMIT_EXCEEDED,
+    делает паузу (с начальным значением initial_wait секунд, которое увеличивается на wait_increment секунд
+    при каждой новой ошибке) и повторяет попытку.
+    
+    :param client: клиент для подключения к ClickHouse
+    :param table: название таблицы для вставки
+    :param batch: данные для вставки (например, список записей)
+    :param columns: список названий колонок
+    :param initial_wait: начальное время ожидания в секундах (по умолчанию 10)
+    :param wait_increment: величина увеличения времени ожидания при повторной ошибке (по умолчанию 10)
+    """
+    wait_time = initial_wait
+    while True:
+        try:
+            client.insert(table, batch, column_names=columns)
+            break  # Если вставка успешна, выходим из цикла
+        except Exception as e:
+            # Проверяем, содержит ли сообщение об ошибке "MEMORY_LIMIT_EXCEEDED"
+            if "MEMORY_LIMIT_EXCEEDED" in str(e):
+                print(
+                    f"⚠️ Превышен лимит памяти. Ждем {wait_time} секунд перед повторной попыткой...")
+                time.sleep(wait_time)
+                wait_time += wait_increment
+            else:
+                # Если ошибка не связана с лимитом памяти, пробрасываем её дальше
+                raise
+
+
 # 📌 Настройки
 BATCH_SIZE = 1000  # Количество записей в батче
 
@@ -110,7 +140,6 @@ def process_data_and_insert(file_data):
     print(f"📊 Найдено {len(records)} контрактов. Загружаем...")
 
     total_inserted = inserted_records
-    missing_keys = set()
 
     for i in range(inserted_records, len(records), BATCH_SIZE):
         batch = []
@@ -125,13 +154,15 @@ def process_data_and_insert(file_data):
                 "content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate",
                 "content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate",
             ]
-            signed_date = next((contract[k] for k in signed_date_keys if k in contract and contract[k]), None)
+            signed_date = next(
+                (contract[k] for k in signed_date_keys if k in contract and contract[k]), None)
             if not signed_date:
                 raise ValueError(
                     f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
             # Разбиваем строку даты "YYYY-MM-DD HH:MM:SS" и извлекаем значения
-            date_parts = signed_date.split(" ")[0].split("-")  # Берём только "YYYY-MM-DD"
+            date_parts = signed_date.split(" ")[0].split(
+                "-")  # Берём только "YYYY-MM-DD"
             partition_year = int(date_parts[0])
             partition_month = int(date_parts[1])
             partition_day = int(date_parts[2])
@@ -142,24 +173,15 @@ def process_data_and_insert(file_data):
             contract_data = extract_contract_data(
                 contract, partition_year, partition_month, partition_day)
 
-            # 📌 Переменные, которые нужно пропустить
-            excluded_keys = {
-                "content__award__contractData__GFE-GFP",
-                "content__award__contractData__GFE-GFP__description",
-                "content__IDV__contractData__GFE-GFP",
-                "content__IDV__contractData__GFE-GFP__description"
-            }
             # ⚠️ Проверяем, есть ли новые переменные, которых нет в `columns`
-            extra_keys = {key for key in set(contract.keys()) - set(columns) if key not in excluded_keys}
-            if extra_keys:
-                missing_keys.update(extra_keys)
+            log_missing_keys(contract, columns, file_path)
 
             batch.append(contract_data)
 
         # 🚀 Вставка в ClickHouse
         if batch:
             # 🔹 Вставка в ClickHouse
-            client.insert("raw_contracts", batch, column_names=columns)
+            insert_batch_with_retry(client, "raw_contracts", batch, columns)
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
             gc.collect()
@@ -173,12 +195,6 @@ def process_data_and_insert(file_data):
         update_status(file_id, "clickhouse_loaded", total_inserted)
     else:
         update_status(file_id, "clickhouse_load_failed", total_inserted)
-
-    # 🔔 Выводим предупреждение о новых переменных
-    if missing_keys:
-        print("⚠️ Найдены новые переменные в JSON, которых нет в `columns`:")
-        for key in missing_keys:
-            print(f"  - {key}")
 
 
 # 🔄 Запуск
