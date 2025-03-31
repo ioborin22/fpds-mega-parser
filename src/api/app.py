@@ -4,8 +4,20 @@ import clickhouse_connect
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from datetime import datetime
 
-templates = Jinja2Templates(directory="/Users/iliaoborin/fpds/src/templates")
+import mysql.connector
+from fpds.config import DB_CONFIG
+
+def get_db_connection():
+    """ Подключение к MySQL """
+    try:
+        return mysql.connector.connect(**DB_CONFIG)
+    except mysql.connector.Error as e:
+        print(f"⚠️ Database connection error: {e}")
+        return None
+
+templates = Jinja2Templates(directory="/Users/iliaoborin/fpds/src/web/templates")
 
 app = FastAPI()
 client = clickhouse_connect.get_client(host="localhost", port=8123)
@@ -27,25 +39,6 @@ async def get_contract(contract_id: str):
     return filtered_data
 
 
-@app.get("/signed/{date}")
-async def get_signed_contracts_count(date: str):
-    query = f"""
-    SELECT COUNT(*)
-    FROM fpds_clickhouse.raw_contracts
-    WHERE arrayExists(x -> toDate(x) = '{date}', [
-        content__award__relevantContractDates__signedDate,
-        content__IDV__relevantContractDates__signedDate,
-        content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate,
-        content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate
-    ])
-    """
-
-    result = client.query(query)
-    count = result.result_rows[0][0] if result.result_rows else 0
-
-    return {"date": date, "contracts_count": count}
-
-
 @app.get("/mutations")
 async def list_mutations():
     """Возвращает список активных мутаций в ClickHouse."""
@@ -58,38 +51,6 @@ async def list_mutations():
     mutations = [dict(zip(result.column_names, row))
                  for row in result.result_rows]
     return {"mutations": mutations}
-
-
-@app.delete("/mutations/{mutation_id}")
-async def delete_mutation(mutation_id: str):
-    """Удаляет указанную мутацию (нужно вручную удалять файлы)."""
-    try:
-        # Удаляем файл мутации вручную в файловой системе (если ClickHouse не поддерживает KILL MUTATION)
-        import os
-        mutation_file = f"/Users/iliaoborin/clickhouse/data/store/bc6/bc6b8dbf-e5e9-4cf3-b1f5-fc400f3ef9a2/{mutation_id}.txt"
-        if os.path.exists(mutation_file):
-            os.remove(mutation_file)
-            return {"status": "success", "message": f"Mutation {mutation_id} deleted."}
-        else:
-            return {"status": "error", "message": "Mutation file not found."}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-
-@app.delete("/mutations")
-async def delete_all_mutations():
-    """Удаляет все мутации."""
-    try:
-        import os
-        import glob
-        mutation_files = glob.glob(
-            "/Users/iliaoborin/clickhouse/data/store/**/mutation_*.txt", recursive=True)
-        for file in mutation_files:
-            os.remove(file)
-        return {"status": "success", "message": "All mutations deleted."}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-    
 
 @app.get("/fpds", response_class=HTMLResponse)
 async def fpds_dashboard(request: Request):
