@@ -52,37 +52,66 @@ async def list_mutations():
                  for row in result.result_rows]
     return {"mutations": mutations}
 
-@app.get("/fpds", response_class=HTMLResponse)
-async def fpds_dashboard(request: Request):
-    query = """
-    SELECT 
-        partition_year, 
-        partition_month, 
-        partition_day, 
-        COUNT(*) as count
-    FROM fpds_clickhouse.raw_contracts
-    GROUP BY partition_year, partition_month, partition_day
-    ORDER BY partition_year, partition_month, partition_day
-    """
-    result = client.query(query)
 
-    # Группируем по годам → год -> [ { date, count }, ... ]
-    grouped = {}
-    for row in result.result_rows:
+@app.get("/", response_class=HTMLResponse)
+async def fpds_dashboard(request: Request):
+    # --- Запрос к ClickHouse ---
+    ch_query = """
+        SELECT 
+            partition_year, 
+            partition_month, 
+            partition_day, 
+            COUNT(*) as count
+        FROM fpds_clickhouse.raw_contracts
+        GROUP BY partition_year, partition_month, partition_day
+        ORDER BY partition_year, partition_month, partition_day
+    """
+    ch_result = client.query(ch_query)
+
+    # Формируем данные из ClickHouse в формате YYYY-MM-DD (без перестановок)
+    clickhouse_data = {}
+    for row in ch_result.result_rows:
         year, month, day, count = row
         date_str = f"{year:04d}-{month:02d}-{day:02d}"
-        if year not in grouped:
-            grouped[year] = []
-        grouped[year].append({
-            "date": date_str,
-            "count": count
+        clickhouse_data[date_str] = count
+
+    # --- Запрос к MySQL ---
+    mysql_data = {}
+    db_conn = get_db_connection()
+    if db_conn:
+        cursor = db_conn.cursor()
+        mysql_query = """
+            SELECT DATE(signed_date) as date, SUM(records) as count
+            FROM signed_date_records
+            GROUP BY date
+        """
+        cursor.execute(mysql_query)
+        mysql_results = cursor.fetchall()
+        for row in mysql_results:
+            date_val, count = row
+            date_str = date_val.strftime("%Y-%m-%d")
+            mysql_data[date_str] = count
+        cursor.close()
+        db_conn.close()
+
+    # --- Объединяем данные для сравнения ---
+    all_dates = set(clickhouse_data.keys()).union(mysql_data.keys())
+    comparison = []
+    for date in sorted(all_dates):
+        ch_count = clickhouse_data.get(date, 0)
+        mysql_count = mysql_data.get(date, 0)
+        difference = ch_count - mysql_count
+        comparison.append({
+            "date": date,
+            "clickhouse_count": ch_count,
+            "mysql_count": mysql_count,
+            "difference": difference
         })
 
     return templates.TemplateResponse("main.html", {
         "request": request,
-        "grouped_data": grouped
+        "comparison": comparison
     })
-
 
 # Запуск сервера:
 # uvicorn src.api.app:app --reload

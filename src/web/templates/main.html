@@ -1,25 +1,164 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>📊 FPDS Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Сравнение контрактов ClickHouse и FPDS</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h2 { margin-top: 30px; }
-        ul { list-style: none; padding: 0; }
-        li { padding: 5px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+            margin: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+        }
+        thead {
+            background-color: #007BFF;
+            color: #fff;
+        }
+        /* Липкая шапка таблицы */
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #007BFF;
+            z-index: 2;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .positive {
+            color: green;
+            font-weight: bold;
+        }
+        .negative {
+            color: red;
+            font-weight: bold;
+        }
+        th.sortable:hover {
+            cursor: pointer;
+            background-color: #0056b3;
+        }
+        /* Кнопка "Наверх" */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Сравнение контрактов ClickHouse и FPDS</h1>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th class="sortable" id="date-header">Дата</th>
+                    <th>ClickHouse</th>
+                    <th>FPDS</th>
+                    <th class="sortable" id="difference-header">Разница</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in comparison %}
+                <tr>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.clickhouse_count }}</td>
+                    <td>{{ item.mysql_count }}</td>
+                    <td class="{% if item.difference > 0 %}positive{% elif item.difference < 0 %}negative{% endif %}">
+                        {{ item.difference }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Кнопка "Наверх" -->
+    <button id="back-to-top">Наверх</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('data-table');
+            let dateSortAsc = true;
+            let diffSortAsc = true;
 
-    <h1>📅 FPDS Контракты по датам</h1>
+            function sortTable(colIndex, isNumeric, sortOrderAsc) {
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                rows.sort((a, b) => {
+                    let aText = a.children[colIndex].innerText.trim();
+                    let bText = b.children[colIndex].innerText.trim();
+                    if (isNumeric) {
+                        return sortOrderAsc 
+                            ? (parseFloat(aText) - parseFloat(bText)) 
+                            : (parseFloat(bText) - parseFloat(aText));
+                    } else {
+                        let aDate = new Date(aText);
+                        let bDate = new Date(bText);
+                        return sortOrderAsc 
+                            ? (aDate - bDate) 
+                            : (bDate - aDate);
+                    }
+                });
+                tbody.innerHTML = '';
+                rows.forEach(row => tbody.appendChild(row));
+            }
 
-    {% for year, dates in grouped_data.items() %}
-        <h2>{{ year }}</h2>
-        <ul>
-            {% for item in dates %}
-                <li>{{ item.date }} — {{ item.count }} контрактов</li>
-            {% endfor %}
-        </ul>
-    {% endfor %}
+            const dateHeader = document.getElementById('date-header');
+            dateHeader.addEventListener('click', function() {
+                sortTable(0, false, dateSortAsc);
+                dateSortAsc = !dateSortAsc;
+            });
+
+            const diffHeader = document.getElementById('difference-header');
+            diffHeader.addEventListener('click', function() {
+                sortTable(3, true, diffSortAsc);
+                diffSortAsc = !diffSortAsc;
+            });
+            
+            // Функционал кнопки "Наверх"
+            const backToTopBtn = document.getElementById('back-to-top');
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 100) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
 </body>
 </html>

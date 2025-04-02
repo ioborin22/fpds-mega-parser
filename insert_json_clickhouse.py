@@ -3,6 +3,7 @@ import clickhouse_connect
 import gc
 import time
 import mysql.connector
+import pendulum
 from pathlib import Path
 from datetime import datetime
 from fpds.cli.parts.utils import process_booleans, log_missing_keys
@@ -160,19 +161,13 @@ def process_data_and_insert(file_data):
                 raise ValueError(
                     f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
-            # Разбиваем строку даты "YYYY-MM-DD HH:MM:SS" и извлекаем значения
-            date_parts = signed_date.split(" ")[0].split(
-                "-")  # Берём только "YYYY-MM-DD"
-            partition_year = int(date_parts[0])
-            partition_month = int(date_parts[1])
-            partition_day = int(date_parts[2])
+            # Парсим дату с помощью Pendulum
+            dt = pendulum.from_format(signed_date, "YYYY-MM-DD HH:mm:ss")
             # 🔄 Преобразуем булевы значения
             contract = process_booleans(contract, bool_fields)
 
             # 📦 Формируем данные
-            contract_data = extract_contract_data(
-                contract, partition_year, partition_month, partition_day)
-
+            contract_data = extract_contract_data(contract, dt.year, dt.month, dt.day)
             # ⚠️ Проверяем, есть ли новые переменные, которых нет в `columns`
             log_missing_keys(contract, columns, file_path)
 
