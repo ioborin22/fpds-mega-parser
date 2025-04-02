@@ -84,7 +84,12 @@ def count_records_for_date(date):
 
 
 def insert_into_db(date, records):
-    """ Вставляет данные в таблицу signed_date_records """
+    """Вставляет или обновляет данные в таблице signed_date_records.
+    
+    Если запись для заданной даты уже существует и количество записей совпадает, ничего не меняется.
+    Если запись существует, но количество записей изменилось – обновляем поле records и updated_at.
+    Если записи нет – добавляем новую запись.
+    """
     if records <= 0:
         return
 
@@ -93,13 +98,30 @@ def insert_into_db(date, records):
         return
 
     cursor = conn.cursor()
-    updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    query = """
-    INSERT INTO signed_date_records (signed_date, records, updated_at)
-    VALUES (%s, %s, %s)
-    ON DUPLICATE KEY UPDATE records=%s, updated_at=%s
-    """
-    cursor.execute(query, (date, records, updated_at, records, updated_at))
+    # Проверяем, существует ли запись для данной даты
+    select_query = "SELECT records FROM signed_date_records WHERE signed_date = %s"
+    cursor.execute(select_query, (date,))
+    row = cursor.fetchone()
+
+    if row is not None:
+        current_records = row[0]
+        if current_records == records:
+            print(
+                f"✅ Данные для {date} не изменились (records: {records}). Пропускаем обновление.")
+            cursor.close()
+            conn.close()
+            return
+        else:
+            updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            update_query = "UPDATE signed_date_records SET records = %s, updated_at = %s WHERE signed_date = %s"
+            cursor.execute(update_query, (records, updated_at, date))
+            print(f"🔄 Обновляем запись для {date}: новое количество {records}")
+    else:
+        updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        insert_query = "INSERT INTO signed_date_records (signed_date, records, updated_at) VALUES (%s, %s, %s)"
+        cursor.execute(insert_query, (date, records, updated_at))
+        print(f"➕ Добавляем новую запись для {date}: {records} записей")
+
     conn.commit()
     cursor.close()
     conn.close()
