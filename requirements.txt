@@ -1,6 +1,7 @@
 aiohappyeyeballs==2.5.0
 aiohttp==3.9.1
 aiosignal==1.3.2
+alembic==1.15.1
 annotated-types==0.7.0
 anyio==4.8.0
 async-timeout==4.0.3
@@ -12,10 +13,12 @@ clickhouse-connect==0.8.15
 clickhouse-driver==0.2.9
 exceptiongroup==1.2.2
 fastapi==0.115.11
--e git+https://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@github.com/ioborin22/fpds-mega-parser.git@37e71b7642f50bd0c4fa10518c2be03d839fc88f#egg=fpds
+-e git+https://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@github.com/ioborin22/fpds-mega-parser.git@3d78d866e26cf06fc8e8435772d0980b2d455165#egg=fpds
 frozenlist==1.5.0
+greenlet==3.1.1
 h11==0.14.0
 idna==3.10
+Jinja2==3.1.6
 lxml==5.3.1
 lz4==4.4.3
 Mako==1.3.9
@@ -24,6 +27,7 @@ multidict==6.1.0
 mysql-connector-python==9.2.0
 numpy==2.0.2
 pandas==2.2.3
+pendulum==3.0.0
 propcache==0.3.0
 psutil==7.0.0
 pydantic==2.10.6
@@ -36,6 +40,7 @@ six==1.17.0
 sniffio==1.3.1
 SQLAlchemy==2.0.38
 starlette==0.46.1
+time-machine==2.16.0
 typing_extensions==4.12.2
 tzdata==2025.1
 tzlocal==5.3.1
