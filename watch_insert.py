@@ -21,4 +21,4 @@ while True:
             ["python3", "/Users/iliaoborin/fpds/insert_json_clickhouse.py"])
     else:
         # print("⏳ Скрипт уже запущен. Ждём следующую минуту...")
-        time.sleep(300)
+        time.sleep(3)
