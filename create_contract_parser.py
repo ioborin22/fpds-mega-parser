@@ -12,16 +12,16 @@ special_fields = {
     "content__IDV__contractData__GFE_GFP__description": "content__IDV__contractData__GFE-GFP__description"
 }
 
-# Переменные, которые **обязательно** должны быть в начале списка
+# Переменные, которые обязательно должны быть в начале списка
 extra_fields = [
-    "partition_year", "partition_month", "partition_day",
+    "partition_date",  # ⬅️ Теперь только одна дата
     "title", "contract_type", "link__rel", "link__type", "link__href", "modified"
 ]
 
 # Регулярное выражение для поиска переменных
 column_pattern = re.compile(r'^\s*([\w__]+)\s+Nullable\(', re.MULTILINE)
 
-# Читаем файл и извлекаем переменные **в порядке появления**
+# Читаем файл и извлекаем переменные в порядке появления
 columns = []
 
 with open(schema_file, "r", encoding="utf-8") as file:
@@ -33,19 +33,17 @@ with open(schema_file, "r", encoding="utf-8") as file:
                 if column_name not in columns:  # Исключаем дубликаты
                     columns.append(column_name)
 
-# Убеждаемся, что **все extra_fields точно добавлены в начале**
+# Убеждаемся, что все extra_fields точно добавлены в начале
 columns = extra_fields + [col for col in columns if col not in extra_fields]
 
 # Генерируем содержимое файла contract_parser.py
-parser_text = """def extract_contract_data(contract, partition_year, partition_month, partition_day):
+parser_text = """def extract_contract_data(contract, partition_date):
     return [
-        partition_year,
-        partition_month,
-        partition_day,
+        partition_date,
 """
 
-# Первые три элемента (partition_year, partition_month, partition_day) уже добавлены вручную
-for col in columns[3:]:
+# Первую переменную (partition_date) уже добавили вручную
+for col in columns[1:]:
     col_name = special_fields.get(col, col)  # Подменяем, если в special_fields
     parser_text += f'        contract.get("{col_name}", None),\n'
 

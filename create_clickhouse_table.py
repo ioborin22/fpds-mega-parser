@@ -20,9 +20,7 @@ CREATE TABLE raw_contracts (
     -- General Content Data
     
     id UUID DEFAULT generateUUIDv4() COMMENT 'Unique identifier for each award' CODEC(ZSTD(1)),
-    partition_year UInt16 DEFAULT 0 COMMENT 'Year used for partitioning' CODEC(ZSTD(1)),
-    partition_month UInt16 DEFAULT 0 COMMENT 'Month used for partitioning' CODEC(ZSTD(1)),
-    partition_day UInt16 DEFAULT 0 COMMENT 'Day used for partitioning' CODEC(ZSTD(1)),
+    partition_date Date32 DEFAULT toDate('1957-01-01') COMMENT 'Date used for partitioning' CODEC(ZSTD(1)),
     title Nullable(String) DEFAULT NULL COMMENT 'Title of the award, including contract number and vendor name' CODEC(ZSTD(3)),
     contract_type Nullable(Enum8('AWARD' = 1, 'IDV' = 2, 'OTHERTRANSACTIONAWARD' = 3, 'OTHERTRANSACTIONIDV' = 4)) DEFAULT NULL COMMENT 'The type of contract' CODEC(T64),
     link__rel Nullable(String) DEFAULT NULL COMMENT 'Relation type of the link (e.g., alternate)' CODEC(ZSTD(3)),
@@ -1138,7 +1136,7 @@ CREATE TABLE raw_contracts (
 
 ) ENGINE = MergeTree()
 ORDER BY id
-PARTITION BY (partition_year, partition_month, partition_day)
+PARTITION BY (partition_date)
 """)
 
 print(f"{GREEN}Новая таблица raw_contracts создана!{RESET}")  # 🟢 Зелёный текст

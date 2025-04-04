@@ -6,26 +6,24 @@ import sys
 
 def get_clickhouse_data():
     """
-    Запрашивает данные из ClickHouse, группируя по дате.
+    Запрашивает данные из ClickHouse, группируя по partition_date.
     Форматирует дату как 'YYYY-MM-DD'.
     """
     client = clickhouse_connect.get_client(host="localhost", port=8123)
     query = """
         SELECT 
-            partition_year, 
-            partition_month, 
-            partition_day, 
+            partition_date, 
             COUNT(*) as count
         FROM fpds_clickhouse.raw_contracts
-        GROUP BY partition_year, partition_month, partition_day
-        ORDER BY partition_year, partition_month, partition_day
+        GROUP BY partition_date
+        ORDER BY partition_date
     """
     result = client.query(query)
     data = {}
-    # Форматирование даты: используем правильный порядок: год-месяц-день
     for row in result.result_rows:
-        year, month, day, count = row
-        date_str = f"{year:04d}-{month:02d}-{day:02d}"
+        partition_date, count = row
+        # partition_date уже в формате datetime.date
+        date_str = partition_date.strftime("%Y-%m-%d")
         data[date_str] = count
     return data
 
@@ -74,16 +72,15 @@ def compare_data():
 def main():
     issues = compare_data()
     if issues:
-        # Берем первую найденную запись
         date, ch_count, mysql_count = issues[0]
         diff = ch_count - mysql_count
         print(
-            f"Найдена расхождения: Дата: {date}, ClickHouse: {ch_count}, MySQL: {mysql_count}, Разница: {diff}")
-        # Здесь можно добавить вызов вашего парсера для обработки данной даты
+            f"🚨 Найдено расхождение: Дата: {date}, ClickHouse: {ch_count}, MySQL: {mysql_count}, Разница: {diff}")
+        # Здесь можно вызвать свой парсер или скачивание для исправления даты
         # Например: download_and_fix(date)
         sys.exit(0)  # Завершаем выполнение скрипта
     else:
-        print("Расхождений не обнаружено.")
+        print("✅ Расхождений не обнаружено.")
 
 
 if __name__ == "__main__":

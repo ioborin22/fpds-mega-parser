@@ -1,7 +1,5 @@
 columns = [
-    "partition_year",
-    "partition_month",
-    "partition_day",
+    "partition_date",
     "title",
     "contract_type",
     "link__rel",

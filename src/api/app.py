@@ -1,26 +1,29 @@
-from fastapi import FastAPI
-import clickhouse_connect
-
-from fastapi import Request
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
-
+import clickhouse_connect
 import mysql.connector
 from fpds.config import DB_CONFIG
 
+# 📂 Путь к HTML-шаблонам
+templates = Jinja2Templates(
+    directory="/Users/iliaoborin/fpds/src/web/templates")
+
+# 🚀 FastAPI приложение
+app = FastAPI()
+
+# 🔌 Клиент ClickHouse
+client = clickhouse_connect.get_client(host="localhost", port=8123)
+
+
 def get_db_connection():
-    """ Подключение к MySQL """
+    """Подключение к MySQL."""
     try:
         return mysql.connector.connect(**DB_CONFIG)
     except mysql.connector.Error as e:
         print(f"⚠️ Database connection error: {e}")
         return None
-
-templates = Jinja2Templates(directory="/Users/iliaoborin/fpds/src/web/templates")
-
-app = FastAPI()
-client = clickhouse_connect.get_client(host="localhost", port=8123)
 
 
 @app.get("/contract/{contract_id}")
@@ -31,7 +34,7 @@ async def get_contract(contract_id: str):
     if not result.result_rows:
         return {"error": "Not found"}
 
-    # Формируем словарь и убираем `None` значения
+    # Формируем словарь и убираем None значения
     contract_data = dict(zip(result.column_names, result.result_rows[0]))
     filtered_data = {key: value for key,
                      value in contract_data.items() if value is not None}
@@ -58,21 +61,20 @@ async def fpds_dashboard(request: Request):
     # --- Запрос к ClickHouse ---
     ch_query = """
         SELECT 
-            partition_year, 
-            partition_month, 
-            partition_day, 
+            partition_date, 
             COUNT(*) as count
         FROM fpds_clickhouse.raw_contracts
-        GROUP BY partition_year, partition_month, partition_day
-        ORDER BY partition_year, partition_month, partition_day
+        GROUP BY partition_date
+        ORDER BY partition_date
     """
     ch_result = client.query(ch_query)
 
-    # Формируем данные из ClickHouse в формате YYYY-MM-DD (без перестановок)
+    # Формируем данные ClickHouse
     clickhouse_data = {}
     for row in ch_result.result_rows:
-        year, month, day, count = row
-        date_str = f"{year:04d}-{month:02d}-{day:02d}"
+        partition_date, count = row
+        # partition_date — это объект date
+        date_str = partition_date.strftime("%Y-%m-%d")
         clickhouse_data[date_str] = count
 
     # --- Запрос к MySQL ---
@@ -94,7 +96,7 @@ async def fpds_dashboard(request: Request):
         cursor.close()
         db_conn.close()
 
-    # --- Объединяем данные для сравнения ---
+    # --- Сравнение данных ---
     all_dates = set(clickhouse_data.keys()).union(mysql_data.keys())
     comparison = []
     for date in sorted(all_dates):
@@ -113,7 +115,7 @@ async def fpds_dashboard(request: Request):
         "comparison": comparison
     })
 
-# Запуск сервера:
+# Запуск:
 # uvicorn src.api.app:app --reload
-# http://127.0.0.1:8000/contract/474855fc-004e-4a25-8d08-bae1cfd27106
+# http://127.0.0.1:8000/contract/<uuid>
 # http://127.0.0.1:8000/mutations

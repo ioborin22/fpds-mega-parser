@@ -14,37 +14,23 @@ from fpds.config import DB_CONFIG
 
 
 def insert_batch_with_retry(client, table, batch, columns, initial_wait=10, wait_increment=10):
-    """
-    Пытается вставить данные в ClickHouse. Если возникает ошибка MEMORY_LIMIT_EXCEEDED,
-    делает паузу (с начальным значением initial_wait секунд, которое увеличивается на wait_increment секунд
-    при каждой новой ошибке) и повторяет попытку.
-    
-    :param client: клиент для подключения к ClickHouse
-    :param table: название таблицы для вставки
-    :param batch: данные для вставки (например, список записей)
-    :param columns: список названий колонок
-    :param initial_wait: начальное время ожидания в секундах (по умолчанию 10)
-    :param wait_increment: величина увеличения времени ожидания при повторной ошибке (по умолчанию 10)
-    """
     wait_time = initial_wait
     while True:
         try:
             client.insert(table, batch, column_names=columns)
-            break  # Если вставка успешна, выходим из цикла
+            break
         except Exception as e:
-            # Проверяем, содержит ли сообщение об ошибке "MEMORY_LIMIT_EXCEEDED"
             if "MEMORY_LIMIT_EXCEEDED" in str(e):
                 print(
                     f"⚠️ Превышен лимит памяти. Ждем {wait_time} секунд перед повторной попыткой...")
                 time.sleep(wait_time)
                 wait_time += wait_increment
             else:
-                # Если ошибка не связана с лимитом памяти, пробрасываем её дальше
                 raise
 
 
 # 📌 Настройки
-BATCH_SIZE = 1000  # Количество записей в батче
+BATCH_SIZE = 1000
 
 # ✅ Подключение к ClickHouse
 print("🔄 Проверяем подключение к ClickHouse...")
@@ -59,7 +45,6 @@ except Exception as e:
 
 
 def get_db_connection():
-    """Подключение к MySQL."""
     try:
         return mysql.connector.connect(**DB_CONFIG)
     except mysql.connector.Error as e:
@@ -68,7 +53,6 @@ def get_db_connection():
 
 
 def get_next_file():
-    """Получает следующий файл для загрузки из MySQL."""
     conn = get_db_connection()
     if not conn:
         return None
@@ -93,7 +77,6 @@ def get_next_file():
 
 
 def update_status(file_id, status, inserted_records=0):
-    """Обновляет статус файла в MySQL."""
     conn = get_db_connection()
     if not conn:
         return
@@ -112,7 +95,6 @@ def update_status(file_id, status, inserted_records=0):
 
 
 def process_data_and_insert(file_data):
-    """Читает JSON и вставляет в ClickHouse"""
     file_path = Path(file_data["file_path"])
     file_id = file_data["id"]
     expected_records = file_data["record_count"]
@@ -148,7 +130,7 @@ def process_data_and_insert(file_data):
             contract = {k: v for k, v in contract.items()
                         if k in columns or str(v).strip()}  # Удаляем пустые значения
 
-            # Определяем год, месяц, день
+            # Определяем дату подписания
             signed_date_keys = [
                 "content__award__relevantContractDates__signedDate",
                 "content__IDV__relevantContractDates__signedDate",
@@ -156,36 +138,36 @@ def process_data_and_insert(file_data):
                 "content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate",
             ]
             signed_date = next(
-                (contract[k] for k in signed_date_keys if k in contract and contract[k]), None)
+                (contract.get(k) for k in signed_date_keys if k in contract and contract[k]), None)
             if not signed_date:
                 raise ValueError(
                     f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
-            # Парсим дату с помощью Pendulum
+            # Парсим дату
             dt = pendulum.from_format(signed_date, "YYYY-MM-DD HH:mm:ss")
-            # 🔄 Преобразуем булевы значения
+            # 🔄 Обрабатываем булевы значения
             contract = process_booleans(contract, bool_fields)
 
             # 📦 Формируем данные
-            contract_data = extract_contract_data(contract, dt.year, dt.month, dt.day)
-            # ⚠️ Проверяем, есть ли новые переменные, которых нет в `columns`
+            # Теперь передаем только partition_date
+            contract_data = extract_contract_data(contract, dt.date())
+
+            # ⚠️ Проверяем наличие неожиданных полей
             log_missing_keys(contract, columns, file_path)
 
             batch.append(contract_data)
 
         # 🚀 Вставка в ClickHouse
         if batch:
-            # 🔹 Вставка в ClickHouse
             insert_batch_with_retry(client, "raw_contracts", batch, columns)
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
             gc.collect()
-            time.sleep(3)  # Предотвращаем перегрузку
+            time.sleep(3)  # Немного подождем, чтобы не перегружать сервер
 
         # 🔄 Обновляем статус в MySQL после каждой вставки
         update_status(file_id, "clickhouse_loaded", total_inserted)
 
-    # 🔔 Проверяем, загружены ли все данные
     if total_inserted >= expected_records:
         update_status(file_id, "clickhouse_loaded", total_inserted)
     else:

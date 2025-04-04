@@ -1,8 +1,6 @@
-def extract_contract_data(contract, partition_year, partition_month, partition_day):
+def extract_contract_data(contract, partition_date):
     return [
-        partition_year,
-        partition_month,
-        partition_day,
+        partition_date,
         contract.get("title", None),
         contract.get("contract_type", None),
         contract.get("link__rel", None),
