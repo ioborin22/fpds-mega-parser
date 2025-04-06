@@ -163,7 +163,7 @@ def process_data_and_insert(file_data):
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
             gc.collect()
-            time.sleep(3)  # Немного подождем, чтобы не перегружать сервер
+            time.sleep(2)  # Немного подождем, чтобы не перегружать сервер
 
         # 🔄 Обновляем статус в MySQL после каждой вставки
         update_status(file_id, "clickhouse_loaded", total_inserted)
