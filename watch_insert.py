@@ -1,24 +1,28 @@
 import time
 import subprocess
-import psutil
+from datetime import datetime
+
+SCRIPT_PATH = "/Users/iliaoborin/fpds/insert_json_clickhouse.py"
 
 
-def is_script_running(script_name):
-    for proc in psutil.process_iter(["pid", "name", "cmdline"]):
-        try:
-            cmdline = proc.info.get("cmdline")
-            if cmdline and script_name in " ".join(cmdline):
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
-    return False
+def start_insert_script():
+    print(
+        f"▶️ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Запуск скрипта вставки...")
+    process = subprocess.Popen(["python3", SCRIPT_PATH])
+    process.wait()
+    return process.returncode
 
 
 while True:
-    if not is_script_running("insert_json_clickhouse.py"):
-        print("▶️ Запускаем insert_json_clickhouse.py")
-        subprocess.Popen(
-            ["python3", "/Users/iliaoborin/fpds/insert_json_clickhouse.py"])
+    return_code = start_insert_script()
+
+    if return_code == 10:
+        print(f"❗ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Скрипт остановился из-за лимита памяти. Ждем 5 минут...")
+        time.sleep(5 * 60)  # 5 минут паузы
+    elif return_code == 0:
+        print(
+            f"✅ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Скрипт завершился нормально.")
+        time.sleep(1)  # 1 секунда паузы
     else:
-        # print("⏳ Скрипт уже запущен. Ждём следующую минуту...")
-        time.sleep(1)
+        print(f"⚠️ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Скрипт завершился с ошибкой {return_code}. Ждем 10 секунд...")
+        time.sleep(10)  # Ошибка - 10 секунд пауза

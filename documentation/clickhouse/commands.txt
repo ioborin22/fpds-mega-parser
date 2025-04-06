@@ -27,6 +27,10 @@ SHOW CREATE TABLE fpds_clickhouse.raw_contracts;
 Чтобы удалить все записи из таблицы в ClickHouse, используйте команду:
 TRUNCATE TABLE fpds_clickhouse.raw_contracts;
 
+UPDATE insert_json_clickhouse
+SET inserted_records = 0,
+    status = 'file_found'
+
 Если вам нужно удалить только определённые записи, используйте команду DELETE (если таблица поддерживает DELETE):
 DELETE FROM fpds_clickhouse.raw_contracts WHERE 1=1;
 

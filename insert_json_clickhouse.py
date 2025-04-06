@@ -4,6 +4,7 @@ import gc
 import time
 import mysql.connector
 import pendulum
+import sys
 from pathlib import Path
 from datetime import datetime
 from fpds.cli.parts.utils import process_booleans, log_missing_keys
@@ -12,25 +13,9 @@ from fpds.cli.parts.columns import columns
 from fpds.cli.parts.bool_fields import bool_fields
 from fpds.config import DB_CONFIG
 
-
-def insert_batch_with_retry(client, table, batch, columns, initial_wait=10, wait_increment=10):
-    wait_time = initial_wait
-    while True:
-        try:
-            client.insert(table, batch, column_names=columns)
-            break
-        except Exception as e:
-            if "MEMORY_LIMIT_EXCEEDED" in str(e):
-                print(
-                    f"⚠️ Превышен лимит памяти. Ждем {wait_time} секунд перед повторной попыткой...")
-                time.sleep(wait_time)
-                wait_time += wait_increment
-            else:
-                raise
-
-
 # 📌 Настройки
 BATCH_SIZE = 1000
+MAX_MEMORY_ERRORS = 3  # Максимально допустимое количество ошибок памяти подряд
 
 # ✅ Подключение к ClickHouse
 print("🔄 Проверяем подключение к ClickHouse...")
@@ -40,8 +25,34 @@ try:
     )
     print("✅ Подключение успешно!")
 except Exception as e:
-    print(f"❌ Ошибка подключения: {e}")
-    exit(1)
+    print(f"❌ Ошибка подключения к ClickHouse: {e}")
+    sys.exit(1)
+
+
+def insert_batch_with_retry(client, table, batch, columns, file_id):
+    wait_time = 10
+    memory_error_count = 0
+
+    while True:
+        try:
+            client.insert(table, batch, column_names=columns)
+            memory_error_count = 0  # Успешная вставка - сбрасываем счётчик
+            break
+        except Exception as e:
+            if "MEMORY_LIMIT_EXCEEDED" in str(e):
+                memory_error_count += 1
+                print(f"⚠️ Ошибка памяти #{memory_error_count}: {e}")
+
+                if memory_error_count >= MAX_MEMORY_ERRORS:
+                    print(
+                        "❌ Превышено количество ошибок памяти. Останавливаем процесс!")
+                    update_status(file_id, "clickhouse_memory_failed")
+                    sys.exit(10)  # <<< Завершаем процесс с кодом 10
+                print(f"⌛ Ждем {wait_time} секунд перед повторной попыткой...")
+                time.sleep(wait_time)
+                wait_time += 10
+            else:
+                raise
 
 
 def get_db_connection():
@@ -113,12 +124,12 @@ def process_data_and_insert(file_data):
     except Exception as e:
         print(f"❌ Ошибка чтения {file_path}: {e}")
         update_status(file_id, "clickhouse_load_failed")
-        return
+        sys.exit(1)
 
     if not records:
         print("⚠️ Файл пуст! Пропускаем.")
         update_status(file_id, "clickhouse_load_failed")
-        return
+        sys.exit(1)
 
     print(f"📊 Найдено {len(records)} контрактов. Загружаем...")
 
@@ -127,46 +138,37 @@ def process_data_and_insert(file_data):
     for i in range(inserted_records, len(records), BATCH_SIZE):
         batch = []
         for contract in records[i:i + BATCH_SIZE]:
-            contract = {k: v for k, v in contract.items()
-                        if k in columns or str(v).strip()}  # Удаляем пустые значения
+            contract = {k: v for k, v in contract.items(
+            ) if k in columns or str(v).strip()}
 
-            # Определяем дату подписания
             signed_date_keys = [
                 "content__award__relevantContractDates__signedDate",
                 "content__IDV__relevantContractDates__signedDate",
                 "content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate",
                 "content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate",
             ]
-            signed_date = next(
-                (contract.get(k) for k in signed_date_keys if k in contract and contract[k]), None)
+            signed_date = next((contract.get(
+                k) for k in signed_date_keys if k in contract and contract[k]), None)
             if not signed_date:
                 raise ValueError(
                     f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
-            # Парсим дату
             dt = pendulum.from_format(signed_date, "YYYY-MM-DD HH:mm:ss")
-            # 🔄 Обрабатываем булевы значения
             contract = process_booleans(contract, bool_fields)
-
-            # 📦 Формируем данные
-            # Теперь передаем только partition_date
             contract_data = extract_contract_data(contract, dt.date())
-
-            # ⚠️ Проверяем наличие неожиданных полей
             log_missing_keys(contract, columns, file_path)
 
             batch.append(contract_data)
 
-        # 🚀 Вставка в ClickHouse
         if batch:
-            insert_batch_with_retry(client, "raw_contracts", batch, columns)
+            insert_batch_with_retry(
+                client, "raw_contracts", batch, columns, file_id)
             total_inserted += len(batch)
             print(f"✅ Вставлено {total_inserted} записей.")
             gc.collect()
-            time.sleep(2)  # Немного подождем, чтобы не перегружать сервер
+            time.sleep(2)
 
-        # 🔄 Обновляем статус в MySQL после каждой вставки
-        update_status(file_id, "clickhouse_loaded", total_inserted)
+            update_status(file_id, "clickhouse_loaded", total_inserted)
 
     if total_inserted >= expected_records:
         update_status(file_id, "clickhouse_loaded", total_inserted)
@@ -182,3 +184,4 @@ if __name__ == "__main__":
         process_data_and_insert(file_data)
     else:
         print("🎉 Нет файлов для обработки. Завершение работы.")
+        sys.exit(0)
