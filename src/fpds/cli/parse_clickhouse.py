@@ -2,15 +2,10 @@ import asyncio
 import json
 import mysql.connector
 import click
-import warnings
-warnings.filterwarnings("ignore")
-import os
 import time
-import sys
 import gc
 from datetime import datetime, timedelta
 from pathlib import Path
-import clickhouse_connect
 from itertools import chain
 
 from fpds.cli.parts.utils import process_booleans, log_missing_keys
@@ -19,6 +14,9 @@ from fpds.cli.parts.columns import columns
 from fpds.cli.parts.bool_fields import bool_fields
 from fpds import fpdsRequest
 from fpds.config import DB_CONFIG
+
+import warnings
+warnings.filterwarnings("ignore")
 
 BATCH_SIZE = 1000
 DATA_DIR = Path("/Users/iliaoborin/fpds/data/")
@@ -199,11 +197,6 @@ def parse_clickhouse(date):
             click.echo(
                 f"✅ Файл найден: {file_path}, продолжаем обработку и вставку в ClickHouse")
 
-            # Запускаем обработку и вставку в ClickHouse
-            # client = clickhouse_connect.get_client(
-            # host="localhost", port=8123, database="fpds_clickhouse")
-            # process_data_and_insert(file_path, client)
-
             # Обновляем статус на 'completed'
             log_parsing_result(last_parsed_date.strftime(
                 '%Y-%m-%d'), str(file_path), "completed", update=True)
@@ -235,18 +228,55 @@ def parse_clickhouse(date):
             file_path = generate_file_path(last_parsed_date.strftime('%Y/%m/%d'))
             save_data_to_file(data, file_path)
 
-        # Запускаем обработку и вставку в ClickHouse
-         # client = clickhouse_connect.get_client(
-            # host="localhost", port=8123, database="fpds_clickhouse")
-         # process_data_and_insert(file_path, client)
 
         # Обновляем статус на 'completed'
         log_parsing_result(last_parsed_date.strftime(
             '%Y-%m-%d'), str(file_path), "completed", update=True)
         click.echo("✅ Данные успешно загружены в ClickHouse, статус 'completed'")
 
-        # year, month, day = date.split("/")
-        # DATA_FILE = Path(os.getenv(
-        #     "DATA_DIR", "/Users/iliaoborin/fpds/data/")) / str(year) / f"{month}_{day}.json"
-        # os.remove(DATA_FILE)
-        # click.echo(f"🗑 Удалён JSON файл: {DATA_FILE}")
+
+@click.command(name="get")
+@click.argument("date")
+@click.option("-o", "--output", required=False, help="Output directory")
+def get_fpds(date, output):
+    """
+    Download FPDS data for a specific date and save as JSON.
+
+    Example:
+        fpds get 2004/07/14
+    """
+    try:
+        year, month, day = date.split("/")
+    except ValueError:
+        click.echo(
+            f"⚠️ Invalid date format: {date}. Expected format: YYYY/MM/DD")
+        return
+
+    data_dir = Path(output) if output else Path("/Users/iliaoborin/fpds/data/")
+    data_file = data_dir / year / f"{month}_{day}.json"
+
+    formatted_date = f"SIGNED_DATE=[{date},{date}]"
+    params = dict([formatted_date.split("=")])
+
+    click.echo(f"🌐 Downloading FPDS data for {date}...")
+
+    request = fpdsRequest(**params, cli_run=True)
+
+    try:
+        data = asyncio.run(request.data())
+        records = list(chain.from_iterable(data))
+
+        # Создаем папку, если не существует
+        data_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Сохраняем в JSON
+        with open(data_file, "w") as outfile:
+            json.dump(records, outfile, indent=4)
+
+        click.echo(f"✅ Saved {len(records)} records to {data_file}")
+
+        if not records:
+            click.echo("⚠️ No records found. The file is empty.")
+
+    except Exception as e:
+        click.echo(f"❌ Error occurred: {e}")
