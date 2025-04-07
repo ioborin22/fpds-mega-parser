@@ -6,6 +6,8 @@ import clickhouse_connect
 import mysql.connector
 from fpds.config import DB_CONFIG
 
+from xml.etree import ElementTree as ET
+
 # 📂 Путь к HTML-шаблонам
 templates = Jinja2Templates(
     directory="/Users/iliaoborin/fpds/src/web/templates")
@@ -125,99 +127,138 @@ def format_bytes(size):
         size /= power
         n += 1
     return f"{size:.2f} {power_labels[n]}"
-    
+
+
+# Функция для рекурсивного парсинга config.xml
+def parse_clickhouse_config(path_to_config):
+    config_data = {}
+    try:
+        tree = ET.parse(path_to_config)
+        root = tree.getroot()
+        for section in root:
+            section_name = section.tag
+            config_data[section_name] = {}
+            for child in section:
+                config_data[section_name][child.tag] = child.text or ''
+    except Exception as e:
+        print(f"⚠️ Ошибка при чтении конфига: {e}")
+    return config_data
 
 @app.get("/clickhouse", response_class=HTMLResponse)
 async def clickhouse_info(request: Request):
     """Панель мониторинга ClickHouse."""
 
-    # 1. Версия ClickHouse
-    version = client.query("SELECT version()").result_rows[0][0]
+    # Чтение конфига ClickHouse
+    def parse_clickhouse_config(path_to_config):
+        config_data = {}
+        try:
+            tree = ET.parse(path_to_config)
+            root = tree.getroot()
+            for section in root:
+                section_name = section.tag
+                config_data[section_name] = {}
+                for child in section:
+                    config_data[section_name][child.tag] = child.text or ''
+        except Exception as e:
+            print(f"⚠️ Ошибка при чтении конфига: {e}")
+        return config_data
 
-    # 2. Важные настройки
-    settings_query = """
-        SELECT name, value
-        FROM system.settings
-        WHERE name IN ('max_memory_usage', 'max_threads', 'max_server_memory_usage', 'max_memory_usage_for_all_queries', 'mark_cache_size', 'uncompressed_cache_size')
-    """
-    settings_result = client.query(settings_query)
-    settings = {name: value for name, value in settings_result.result_rows}
+    # Путь до твоего конфига
+    config_path = '/Users/iliaoborin/clickhouse/25.2.1.3085-stable/preprocessed_configs/config.xml'
+    clickhouse_config = parse_clickhouse_config(config_path)
 
-    # 3. Активные запросы
-    active_queries = client.query(
-        "SELECT count() FROM system.processes").result_rows[0][0]
-
-    # 4. Размер базы данных
-    db_size_result = client.query("""
-        SELECT sum(bytes_on_disk) AS total_bytes, sum(rows) AS total_rows
-        FROM system.parts
-        WHERE database = 'fpds_clickhouse'
-    """)
-    total_bytes, total_rows = db_size_result.result_rows[0]
-    formatted_total_bytes = format_bytes(total_bytes)
-
-    # 5. Аптайм сервера
-    uptime_result = client.query(
-        "SELECT formatReadableTimeDelta(uptime())").result_rows[0][0]
-
-    # 6. Использование дисков
-    disks_query = """
-        SELECT name, free_space, total_space
-        FROM system.disks
-    """
-    disks_result = client.query(disks_query)
-    disks = [{
-        "name": row[0],
-        "free_space": format_bytes(row[1]),
-        "total_space": format_bytes(row[2])
-    } for row in disks_result.result_rows]
-
-    # 7. Загрузка CPU
-    cpu_query = """
-        SELECT metric, value
-        FROM system.metrics
-        WHERE metric LIKE '%CPU%'
-    """
-    cpu_result = client.query(cpu_query)
-    cpu_metrics = {metric: value for metric, value in cpu_result.result_rows}
-
-    # 8. Ошибки сервера
-    errors_result = client.query("""
-    SELECT value
-    FROM system.events
-    WHERE event = 'ExceptionWhileProcessing'
-    """)
-    server_errors = errors_result.result_rows[0][0] if errors_result.result_rows else 0
-
-    # 9. Статистика кеша (без падения, если нет таблицы)
     try:
-        cache_query = """
-            SELECT cache_name, hits, misses, round(hits / (hits + misses + 0.001), 3) as hit_ratio FROM system.cache_diagnostics
-        """
-        cache_result = client.query(cache_query)
-        cache_stats = [{
-            "cache_name": row[0],
-            "hits": row[1],
-            "misses": row[2],
-            "hit_ratio": row[3]
-        } for row in cache_result.result_rows]
-    except Exception as e:
-        print(f"⚠️ Не удалось получить кеш-статистику: {e}")
-        cache_stats = []  # Пустой список, чтобы шаблон не упал
+        # 1. Версия ClickHouse
+        version = client.query("SELECT version()").result_rows[0][0]
 
-    return templates.TemplateResponse("clickhouse.html", {
-        "request": request,
-        "version": version,
-        "settings": settings,
-        "active_queries": active_queries,
-        "total_bytes": formatted_total_bytes,
-        "total_rows": total_rows,
-        "uptime": uptime_result,
-        "disks": disks,
-        "cpu_metrics": cpu_metrics,
-        "server_errors": server_errors,
-        "cache_stats": cache_stats
-    })
+        # 2. Важные настройки
+        settings_query = """
+            SELECT name, value
+            FROM system.settings
+            WHERE name IN ('max_memory_usage', 'max_threads', 'max_server_memory_usage', 'max_memory_usage_for_all_queries', 'mark_cache_size', 'uncompressed_cache_size')
+        """
+        settings_result = client.query(settings_query)
+        settings = {name: value for name, value in settings_result.result_rows}
+
+        # 3. Активные запросы
+        active_queries = client.query(
+            "SELECT count() FROM system.processes").result_rows[0][0]
+
+        # 4. Размер базы данных
+        db_size_result = client.query("""
+            SELECT sum(bytes_on_disk) AS total_bytes, sum(rows) AS total_rows
+            FROM system.parts
+            WHERE database = 'fpds_clickhouse'
+        """)
+        total_bytes, total_rows = db_size_result.result_rows[0]
+        formatted_total_bytes = format_bytes(total_bytes)
+
+        # 5. Аптайм сервера
+        uptime_result = client.query(
+            "SELECT formatReadableTimeDelta(uptime())").result_rows[0][0]
+
+        # 6. Использование дисков
+        disks_query = "SELECT name, free_space, total_space FROM system.disks"
+        disks_result = client.query(disks_query)
+        disks = [{
+            "name": row[0],
+            "free_space": format_bytes(row[1]),
+            "total_space": format_bytes(row[2])
+        } for row in disks_result.result_rows]
+
+        # 7. Загрузка CPU
+        cpu_query = "SELECT metric, value FROM system.metrics WHERE metric LIKE '%CPU%'"
+        cpu_result = client.query(cpu_query)
+        cpu_metrics = {metric: value for metric,
+                       value in cpu_result.result_rows}
+
+        # 8. Ошибки сервера
+        errors_result = client.query("""
+            SELECT value
+            FROM system.events
+            WHERE event = 'ExceptionWhileProcessing'
+        """)
+        server_errors = errors_result.result_rows[0][0] if errors_result.result_rows else 0
+
+        # 9. Статистика кеша
+        try:
+            cache_query = """
+                SELECT cache_name, hits, misses, round(hits / (hits + misses + 0.001), 3) as hit_ratio
+                FROM system.cache_diagnostics
+            """
+            cache_result = client.query(cache_query)
+            cache_stats = [{
+                "cache_name": row[0],
+                "hits": row[1],
+                "misses": row[2],
+                "hit_ratio": row[3]
+            } for row in cache_result.result_rows]
+        except Exception as e:
+            print(f"⚠️ Не удалось получить кеш-статистику: {e}")
+            cache_stats = []
+
+        return templates.TemplateResponse("clickhouse.html", {
+            "request": request,
+            "version": version,
+            "settings": settings,
+            "active_queries": active_queries,
+            "total_bytes": formatted_total_bytes,
+            "total_rows": total_rows,
+            "uptime": uptime_result,
+            "disks": disks,
+            "cpu_metrics": cpu_metrics,
+            "server_errors": server_errors,
+            "cache_stats": cache_stats,
+            "clickhouse_config": clickhouse_config  # <<< Передаём!
+        })
+
+    except Exception as e:
+        print(f"❌ ClickHouse недоступен: {e}")
+        return templates.TemplateResponse("clickhouse.html", {
+            "request": request,
+            "clickhouse_running": False,
+            "clickhouse_config": clickhouse_config
+        })
 
 # Запуск:
 # uvicorn src.api.app:app --reload

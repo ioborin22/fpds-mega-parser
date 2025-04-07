@@ -11,7 +11,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
@@ -25,22 +25,19 @@
         }
         h2 {
             color: #555;
-            margin-top: 20px;
+            margin-top: 30px;
+        }
+        ul, p {
+            background: #f2f2f2;
+            padding: 12px;
+            border-radius: 5px;
         }
         ul {
             list-style-type: none;
-            padding: 0;
+            padding-left: 15px;
         }
         ul li {
-            background: #f2f2f2;
             margin-bottom: 8px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        p {
-            background: #f2f2f2;
-            padding: 10px;
-            border-radius: 5px;
         }
         a.button {
             display: inline-block;
@@ -58,7 +55,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         th, td {
             padding: 10px;
@@ -85,51 +82,53 @@
             <a href="/" class="button">⬅️ Назад к Сравнению</a>
         </div>
 
-        <h2>Version</h2>
+        <h2>🛠️ Версия сервера</h2>
         <p>{{ version }}</p>
 
-        <h2>Uptime</h2>
+        <h2>⏳ Аптайм сервера</h2>
         <p>{{ uptime }}</p>
 
-        <h2>Settings</h2>
+        <h2>⚙️ Основные настройки</h2>
         <ul>
             {% for name, value in settings.items() %}
                 <li><strong>{{ name }}:</strong> {{ value }}</li>
             {% endfor %}
         </ul>
 
-        <h2>Active Queries</h2>
-        <p><strong>Currently Running:</strong> {{ active_queries }}</p>
+        <h2>📊 Активные запросы</h2>
+        <p><strong>Количество активных запросов:</strong> {{ active_queries }}</p>
 
-        <h2>Database Size</h2>
-        <p><strong>Total Rows:</strong> {{ total_rows }}</p>
-        <p><strong>Total Size:</strong> {{ total_bytes }}</p>
+        <h2>🗄️ Размер базы данных (fpds_clickhouse)</h2>
+        <p><strong>Строк:</strong> {{ total_rows }}</p>
+        <p><strong>Размер:</strong> {{ total_bytes }}</p>
 
-        <h2>Disk Usage</h2>
+        <h2>💾 Использование дисков</h2>
         <ul>
             {% for disk in disks %}
-                <li><strong>{{ disk.name }}</strong>: {{ disk.free_space }} free / {{ disk.total_space }} total</li>
+                <li><strong>{{ disk.name }}:</strong> {{ disk.free_space }} свободно / {{ disk.total_space }} всего</li>
             {% endfor %}
         </ul>
 
-        <h2>CPU Metrics</h2>
+        {% if cpu_metrics %}
+        <h2>🧠 Загрузка CPU</h2>
         <ul>
             {% for metric, value in cpu_metrics.items() %}
                 <li><strong>{{ metric }}:</strong> {{ value }}</li>
             {% endfor %}
         </ul>
+        {% endif %}
 
-        <h2>Server Errors</h2>
-        <p><strong>Exceptions while processing:</strong> {{ server_errors }}</p>
+        <h2>🚨 Ошибки сервера</h2>
+        <p><strong>Исключений при обработке:</strong> {{ server_errors }}</p>
 
         {% if cache_stats %}
-        <h2>Cache Stats</h2>
+        <h2>🧩 Статистика кеша</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Cache</th>
-                    <th>Hits</th>
-                    <th>Misses</th>
+                    <th>Имя кеша</th>
+                    <th>Хиты</th>
+                    <th>Промахи</th>
                     <th>Hit Ratio</th>
                 </tr>
             </thead>
@@ -146,6 +145,17 @@
         </table>
         {% endif %}
 
+        {% if clickhouse_config %}
+        <h2>⚙️ Настройки ClickHouse (из config.xml)</h2>
+        {% for section, params in clickhouse_config.items() %}
+            <h3>{{ section }}</h3>
+            <ul>
+                {% for key, value in params.items() %}
+                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+        {% endif %}
     </div>
 </body>
 </html>
