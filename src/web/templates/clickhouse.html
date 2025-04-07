@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ClickHouse Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+            margin: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #f2f2f2;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        p {
+            background: #f2f2f2;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        a.button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        thead {
+            background-color: #007BFF;
+            color: white;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ClickHouse Monitor</h1>
+
+        <!-- 🔙 Кнопка Назад -->
+        <div style="text-align: center;">
+            <a href="/" class="button">⬅️ Назад к Сравнению</a>
+        </div>
+
+        <h2>Version</h2>
+        <p>{{ version }}</p>
+
+        <h2>Uptime</h2>
+        <p>{{ uptime }}</p>
+
+        <h2>Settings</h2>
+        <ul>
+            {% for name, value in settings.items() %}
+                <li><strong>{{ name }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Active Queries</h2>
+        <p><strong>Currently Running:</strong> {{ active_queries }}</p>
+
+        <h2>Database Size</h2>
+        <p><strong>Total Rows:</strong> {{ total_rows }}</p>
+        <p><strong>Total Size:</strong> {{ total_bytes }}</p>
+
+        <h2>Disk Usage</h2>
+        <ul>
+            {% for disk in disks %}
+                <li><strong>{{ disk.name }}</strong>: {{ disk.free_space }} free / {{ disk.total_space }} total</li>
+            {% endfor %}
+        </ul>
+
+        <h2>CPU Metrics</h2>
+        <ul>
+            {% for metric, value in cpu_metrics.items() %}
+                <li><strong>{{ metric }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Server Errors</h2>
+        <p><strong>Exceptions while processing:</strong> {{ server_errors }}</p>
+
+        {% if cache_stats %}
+        <h2>Cache Stats</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Cache</th>
+                    <th>Hits</th>
+                    <th>Misses</th>
+                    <th>Hit Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cache in cache_stats %}
+                <tr>
+                    <td>{{ cache.cache_name }}</td>
+                    <td>{{ cache.hits }}</td>
+                    <td>{{ cache.misses }}</td>
+                    <td>{{ cache.hit_ratio }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+    </div>
+</body>
+</html>

@@ -75,11 +75,31 @@
             display: none;
             z-index: 1000;
         }
+
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        a.button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Сравнение контрактов ClickHouse и FPDS</h1>
+        <!-- 👉 Добавляем кнопку-ссылку -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="/clickhouse" class="button">
+            Перейти к ClickHouse Monitor
+        </a>
+    </div>
         <table id="data-table">
             <thead>
                 <tr>
