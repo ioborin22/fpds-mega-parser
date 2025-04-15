@@ -136,7 +136,6 @@ def parse_clickhouse_config(path_to_config):
         print(f"⚠️ Ошибка при чтении конфига: {e}")
     return config_data
 
-
 @app.get("/clickhouse", response_class=HTMLResponse)
 async def clickhouse_info(request: Request):
     """Панель мониторинга ClickHouse."""
