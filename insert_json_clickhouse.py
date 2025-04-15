@@ -68,7 +68,6 @@ def get_db_connection():
         print(f"⚠️ Ошибка подключения к БД: {e}")
         return None
 
-
 def get_next_file():
     conn = get_db_connection()
     if not conn:
