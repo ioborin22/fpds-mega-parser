@@ -14,7 +14,7 @@ from fpds.cli.parts.bool_fields import bool_fields
 from fpds.config import DB_CONFIG
 
 # 📌 Настройки
-BATCH_SIZE = 500
+BATCH_SIZE = 1000
 MAX_MEMORY_ERRORS = 10  # Максимально допустимое количество ошибок памяти подряд
 
 # ✅ Подключение к ClickHouse
