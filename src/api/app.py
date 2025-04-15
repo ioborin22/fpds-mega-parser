@@ -120,7 +120,6 @@ def format_bytes(size):
         n += 1
     return f"{size:.2f} {power_labels[n]}"
 
-
 # Функция для рекурсивного парсинга config.xml
 def parse_clickhouse_config(path_to_config):
     config_data = {}
