@@ -2,13 +2,13 @@ import time
 import subprocess
 from datetime import datetime
 
-SCRIPT_PATH = "/Users/iliaoborin/fpds/insert_json_clickhouse.py"
+SCRIPT_PATH = "C:/Users/win11/Projects/fpds/insert_json_clickhouse.py"
 
 
 def start_insert_script():
     print(
         f"▶️ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Запуск скрипта вставки...")
-    process = subprocess.Popen(["python3", SCRIPT_PATH])
+    process = subprocess.Popen(["python", SCRIPT_PATH])
     process.wait()
     return process.returncode
 

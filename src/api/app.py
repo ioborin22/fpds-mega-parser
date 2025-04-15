@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
-import clickhouse_connect
+from clickhouse_driver import Client
 import mysql.connector
 from fpds.config import DB_CONFIG
 
@@ -10,13 +10,20 @@ from xml.etree import ElementTree as ET
 
 # 📂 Путь к HTML-шаблонам
 templates = Jinja2Templates(
-    directory="/Users/iliaoborin/fpds/src/web/templates")
+    directory=r"C:\Users\win11\Projects\fpds\src\web\templates"
+)
 
 # 🚀 FastAPI приложение
 app = FastAPI()
 
-# 🔌 Клиент ClickHouse
-client = clickhouse_connect.get_client(host="localhost", port=8123)
+# 🔌 Клиент ClickHouse (TCP порт 9000 по умолчанию)
+client = Client(
+    host="localhost",
+    port=9000,
+    database="fpds_clickhouse",
+    user="default",
+    password=""
+)
 
 
 def get_db_connection():
@@ -26,37 +33,6 @@ def get_db_connection():
     except mysql.connector.Error as e:
         print(f"⚠️ Database connection error: {e}")
         return None
-
-
-@app.get("/contract/{contract_id}")
-async def get_contract(contract_id: str):
-    query = f"SELECT * FROM fpds_clickhouse.raw_contracts WHERE id = toUUID('{contract_id}') LIMIT 1"
-    result = client.query(query)
-
-    if not result.result_rows:
-        return {"error": "Not found"}
-
-    # Формируем словарь и убираем None значения
-    contract_data = dict(zip(result.column_names, result.result_rows[0]))
-    filtered_data = {key: value for key,
-                     value in contract_data.items() if value is not None}
-
-    return filtered_data
-
-
-@app.get("/mutations")
-async def list_mutations():
-    """Возвращает список активных мутаций в ClickHouse."""
-    query = """
-    SELECT mutation_id, command, is_done, is_killed
-    FROM system.mutations
-    WHERE table = 'raw_contracts' AND database = 'fpds_clickhouse'
-    """
-    result = client.query(query)
-    mutations = [dict(zip(result.column_names, row))
-                 for row in result.result_rows]
-    return {"mutations": mutations}
-
 
 @app.get("/", response_class=HTMLResponse)
 async def fpds_dashboard(request: Request):
@@ -69,14 +45,15 @@ async def fpds_dashboard(request: Request):
         GROUP BY partition_date
         ORDER BY partition_date
     """
-    ch_result = client.query(ch_query)
+    ch_result = client.execute(ch_query)  # ⬅️ используем clickhouse-driver
 
     # Формируем данные ClickHouse
     clickhouse_data = {}
-    for row in ch_result.result_rows:
-        partition_date, count = row
-        # partition_date — это объект date
-        date_str = partition_date.strftime("%Y-%m-%d")
+    for partition_date, count in ch_result:
+        if isinstance(partition_date, str):
+            date_str = partition_date
+        else:
+            date_str = partition_date.strftime("%Y-%m-%d")
         clickhouse_data[date_str] = count
 
     # --- Запрос к MySQL ---
@@ -91,8 +68,7 @@ async def fpds_dashboard(request: Request):
         """
         cursor.execute(mysql_query)
         mysql_results = cursor.fetchall()
-        for row in mysql_results:
-            date_val, count = row
+        for date_val, count in mysql_results:
             date_str = date_val.strftime("%Y-%m-%d")
             mysql_data[date_str] = count
         cursor.close()
@@ -116,6 +92,22 @@ async def fpds_dashboard(request: Request):
         "request": request,
         "comparison": comparison
     })
+
+# Singl contract view
+@app.get("/contract/{contract_id}")
+async def get_contract(contract_id: str):
+    query = f"SELECT * FROM fpds_clickhouse.raw_contracts WHERE id = toUUID('{contract_id}') LIMIT 1"
+    result = client.query(query)
+
+    if not result.result_rows:
+        return {"error": "Not found"}
+
+    # Формируем словарь и убираем None значения
+    contract_data = dict(zip(result.column_names, result.result_rows[0]))
+    filtered_data = {key: value for key,
+                     value in contract_data.items() if value is not None}
+
+    return filtered_data
 
 
 def format_bytes(size):

@@ -46,66 +46,8 @@ GROUP BY partition_year
 ORDER BY partition_year;
 
 Сбросить
-UPDATE file_processing_status 
+UPDATE insert_json_clickhouse 
 SET status = 'file_found', inserted_records = 0;
-
-
-УДАЛЕНИЯ ЗА ДЕНЬ
-
-Шаг 1: Посчитать количество записей за 1980-02-15
-SELECT COUNT(*)
-FROM fpds_clickhouse.raw_contracts
-WHERE 
-    toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
-    OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
-    OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-    OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15';
-
-Посчитать количество записей за дату + партиция
-SELECT COUNT(*)
-FROM fpds_clickhouse.raw_contracts
-WHERE 
-    partition_year = 1980
-    AND (
-        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-    );
-
-
-Удалить 1000 записей
-ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
-WHERE id IN (
-    SELECT id
-    FROM fpds_clickhouse.raw_contracts
-    WHERE 
-        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-    LIMIT 1000
-);
-
-Удалить 1000 записей + партиция
-ALTER TABLE fpds_clickhouse.raw_contracts DELETE 
-WHERE partition_year = 1980
-AND id IN (
-    SELECT id FROM fpds_clickhouse.raw_contracts
-    WHERE partition_year = 1980
-    AND (
-        toDate(content__award__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__IDV__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-        OR toDate(content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate) = '1980-02-15'
-    )
-    LIMIT 1000
-);
-
-🔴 Важное замечание:
-В ClickHouse DELETE не удаляет мгновенно, а помечает записи для удаления. Чтобы очистить физически, выполни:
-
-OPTIMIZE TABLE fpds_clickhouse.raw_contracts FINAL;
 
 Чтобы не нагружать сервер, лучше делать оптимизацию по партициям:
 OPTIMIZE TABLE fpds_clickhouse.raw_contracts PARTITION 1979 FINAL;

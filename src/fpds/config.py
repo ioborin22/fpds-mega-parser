@@ -44,7 +44,7 @@ with Path(FPDS_FIELDS_FILE_PATH).open(encoding="utf-8") as file:  # type: ignore
 load_dotenv()
 DB_TYPE = os.getenv("DB_TYPE", "mysql")  # mysql, postgresql, sqlite и т. д.
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "8889")
+DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME", "fpds")
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "root")

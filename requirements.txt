@@ -13,11 +13,11 @@ clickhouse-connect==0.8.15
 clickhouse-driver==0.2.9
 exceptiongroup==1.2.2
 fastapi==0.115.11
--e git+https://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@github.com/ioborin22/fpds-mega-parser.git@3d78d866e26cf06fc8e8435772d0980b2d455165#egg=fpds
 frozenlist==1.5.0
 greenlet==3.1.1
 h11==0.14.0
 idna==3.10
+ijson==3.3.0
 Jinja2==3.1.6
 lxml==5.3.1
 lz4==4.4.3
