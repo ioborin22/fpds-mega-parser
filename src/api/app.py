@@ -25,7 +25,6 @@ client = Client(
     password=""
 )
 
-
 def get_db_connection():
     """Подключение к MySQL."""
     try:
