@@ -61,7 +61,6 @@ def insert_batch_with_retry(client, table, batch, columns, file_id):
             else:
                 raise
 
-
 def get_db_connection():
     try:
         return mysql.connector.connect(**DB_CONFIG)
