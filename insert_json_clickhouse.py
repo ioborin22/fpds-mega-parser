@@ -1,3 +1,5 @@
+import os
+import traceback
 import json
 import clickhouse_connect
 import time
@@ -12,6 +14,15 @@ from fpds.cli.parts.contract_parser import extract_contract_data
 from fpds.cli.parts.columns import columns
 from fpds.cli.parts.bool_fields import bool_fields
 from fpds.config import DB_CONFIG
+
+LOG_FILE = os.path.join(os.path.dirname(__file__), 'error_log.txt')
+
+def log_error_to_file(error_msg, file_path):
+    with open(LOG_FILE, 'a', encoding='utf-8') as f:
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        f.write(f"\n[{timestamp}] ❌ Ошибка обработки файла: {file_path}\n")
+        f.write(error_msg)
+        f.write('\n' + '='*80 + '\n')
 
 # 📌 Настройки
 BATCH_SIZE = 1000
@@ -182,7 +193,9 @@ def process_data_and_insert(file_data):
             print("⚠️ Не все записи загружены!")
 
     except Exception as e:
+        full_trace = traceback.format_exc()
         print(f"❌ Ошибка обработки файла: {e}")
+        log_error_to_file(full_trace, str(file_path))  # filepath = путь к файлу, например "D:/data/2013/02_06.json"
         update_status(file_id, "clickhouse_load_failed", total_inserted)
 
 
