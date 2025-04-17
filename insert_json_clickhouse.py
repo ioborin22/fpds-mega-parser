@@ -195,7 +195,7 @@ def process_data_and_insert(file_data):
     except Exception as e:
         full_trace = traceback.format_exc()
         print(f"❌ Ошибка обработки файла: {e}")
-        log_error_to_file(full_trace, str(file_path))  # filepath = путь к файлу, например "D:/data/2013/02_06.json"
+        log_error_to_file(full_trace, str(file_path))
         update_status(file_id, "clickhouse_load_failed", total_inserted)
 
 
