@@ -35,7 +35,6 @@
             background-color: #007BFF;
             color: #fff;
         }
-        /* Липкая шапка таблицы */
         thead th {
             position: sticky;
             top: 0;
@@ -60,7 +59,6 @@
             cursor: pointer;
             background-color: #0056b3;
         }
-        /* Кнопка "Наверх" */
         #back-to-top {
             position: fixed;
             bottom: 20px;
@@ -75,7 +73,6 @@
             display: none;
             z-index: 1000;
         }
-
         a.button {
             display: inline-block;
             margin-top: 20px;
@@ -94,12 +91,14 @@
 <body>
     <div class="container">
         <h1>Сравнение контрактов ClickHouse и FPDS</h1>
-        <!-- 👉 Добавляем кнопку-ссылку -->
-    <div style="text-align: center; margin-bottom: 20px;">
-        <a href="/clickhouse" class="button">
-            Перейти к ClickHouse Monitor
-        </a>
-    </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/clickhouse" class="button">Перейти к ClickHouse Monitor</a>
+        </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/contracts-descriptions" class="button">Contracts Descriptions</a>
+        </div>
+
         <table id="data-table">
             <thead>
                 <tr>
@@ -114,7 +113,7 @@
                 <tr>
                     <td>{{ item.date }}</td>
                     <td>{{ item.clickhouse_count }}</td>
-                    <td>{{ item.mysql_count }}</td>
+                    <td>{{ item.fpds_count }}</td>
                     <td class="{% if item.difference > 0 %}positive{% elif item.difference < 0 %}negative{% endif %}">
                         {{ item.difference }}
                     </td>
@@ -123,8 +122,9 @@
             </tbody>
         </table>
     </div>
-    <!-- Кнопка "Наверх" -->
+
     <button id="back-to-top">Наверх</button>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const table = document.getElementById('data-table');
@@ -164,8 +164,7 @@
                 sortTable(3, true, diffSortAsc);
                 diffSortAsc = !diffSortAsc;
             });
-            
-            // Функционал кнопки "Наверх"
+
             const backToTopBtn = document.getElementById('back-to-top');
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 100) {
@@ -174,7 +173,7 @@
                     backToTopBtn.style.display = 'none';
                 }
             });
-            
+
             backToTopBtn.addEventListener('click', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });

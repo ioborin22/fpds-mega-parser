@@ -50,7 +50,7 @@ CREATE TABLE raw_contracts (
     content__award__dollarValues__baseAndAllOptionsValue Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'The base and all options value of the contract' CODEC(ZSTD(3)),
     content__award__totalDollarValues__totalObligatedAmount Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'The total obligated amount for the contract' CODEC(ZSTD(3)),
     content__award__totalDollarValues__totalBaseAndExercisedOptionsValue Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'The total base and exercised options value of the contract' CODEC(ZSTD(3)),
-    content__award__totalDollarValues__totalBaseAndAllOptionsValue Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'The total base and all options value of the contract' CODEC(ZSTD(3)),
+    content__award__totalDollarValues__totalBaseAndAllOptionsValue Nullable(Decimal(15,2)) DEFAULT NULL COMMENT 'The total base and all options value of the contract' CODEC(ZSTD(3)),     
     content__award__purchaserInformation__contractingOfficeAgencyID Nullable(String) DEFAULT NULL COMMENT 'The ID of the contracting office agency' CODEC(ZSTD(3)),
     content__award__purchaserInformation__contractingOfficeAgencyID__name Nullable(String) DEFAULT NULL COMMENT 'The name of the contracting office agency' CODEC(ZSTD(3)),
     content__award__purchaserInformation__contractingOfficeAgencyID__departmentID Nullable(String) DEFAULT NULL COMMENT 'The department ID of the contracting office agency' CODEC(ZSTD(3)),

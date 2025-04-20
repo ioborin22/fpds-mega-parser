@@ -99,7 +99,7 @@ def insert_into_db(date, records):
 
     cursor = conn.cursor()
     # Проверяем, существует ли запись для данной даты
-    select_query = "SELECT records FROM signed_date_records WHERE signed_date = %s"
+    select_query = "SELECT fpds_records FROM signed_date_records WHERE signed_date = %s"
     cursor.execute(select_query, (date,))
     row = cursor.fetchone()
 
@@ -113,12 +113,12 @@ def insert_into_db(date, records):
             return
         else:
             updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            update_query = "UPDATE signed_date_records SET records = %s, updated_at = %s WHERE signed_date = %s"
+            update_query = "UPDATE signed_date_records SET fpds_records = %s, updated_at = %s WHERE signed_date = %s"
             cursor.execute(update_query, (records, updated_at, date))
             print(f"🔄 Обновляем запись для {date}: новое количество {records}")
     else:
         updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        insert_query = "INSERT INTO signed_date_records (signed_date, records, updated_at) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO signed_date_records (signed_date, fpds_records, updated_at) VALUES (%s, %s, %s)"
         cursor.execute(insert_query, (date, records, updated_at))
         print(f"➕ Добавляем новую запись для {date}: {records} записей")
 

@@ -35,62 +35,33 @@ def get_db_connection():
 
 @app.get("/", response_class=HTMLResponse)
 async def fpds_dashboard(request: Request):
-    # --- Запрос к ClickHouse ---
-    ch_query = """
-        SELECT 
-            partition_date, 
-            COUNT(*) as count
-        FROM fpds_clickhouse.raw_contracts
-        GROUP BY partition_date
-        ORDER BY partition_date
-    """
-    ch_result = client.execute(ch_query)  # ⬅️ используем clickhouse-driver
-
-    # Формируем данные ClickHouse
-    clickhouse_data = {}
-    for partition_date, count in ch_result:
-        if isinstance(partition_date, str):
-            date_str = partition_date
-        else:
-            date_str = partition_date.strftime("%Y-%m-%d")
-        clickhouse_data[date_str] = count
-
-    # --- Запрос к MySQL ---
-    mysql_data = {}
     db_conn = get_db_connection()
-    if db_conn:
-        cursor = db_conn.cursor()
-        mysql_query = """
-            SELECT DATE(signed_date) as date, SUM(records) as count
-            FROM signed_date_records
-            GROUP BY date
-        """
-        cursor.execute(mysql_query)
-        mysql_results = cursor.fetchall()
-        for date_val, count in mysql_results:
-            date_str = date_val.strftime("%Y-%m-%d")
-            mysql_data[date_str] = count
-        cursor.close()
-        db_conn.close()
+    if not db_conn:
+        return HTMLResponse(content="<h2>❌ Ошибка подключения к MySQL</h2>", status_code=500)
 
-    # --- Сравнение данных ---
-    all_dates = set(clickhouse_data.keys()).union(mysql_data.keys())
     comparison = []
-    for date in sorted(all_dates):
-        ch_count = clickhouse_data.get(date, 0)
-        mysql_count = mysql_data.get(date, 0)
-        difference = ch_count - mysql_count
+    cursor = db_conn.cursor()
+    query = """
+        SELECT signed_date, fpds_records, clickhouse_records
+        FROM signed_date_records
+        ORDER BY signed_date DESC
+    """
+    cursor.execute(query)
+    for signed_date, fpds, ch in cursor.fetchall():
         comparison.append({
-            "date": date,
-            "clickhouse_count": ch_count,
-            "mysql_count": mysql_count,
-            "difference": difference
+            "date": signed_date.strftime("%Y-%m-%d"),
+            "fpds_count": fpds,
+            "clickhouse_count": ch,
+            "difference": ch - fpds
         })
+    cursor.close()
+    db_conn.close()
 
     return templates.TemplateResponse("main.html", {
         "request": request,
         "comparison": comparison
     })
+
 
 # Singl contract view
 @app.get("/contract/{contract_id}")
@@ -249,6 +220,53 @@ async def clickhouse_info(request: Request):
             "clickhouse_running": False,
             "clickhouse_config": clickhouse_config
         })
+    
+@app.get("/contracts-descriptions", response_class=HTMLResponse)
+async def contracts_descriptions(request: Request):
+    import json
+
+    json_path = r"C:\Users\win11\Projects\fpds\documentation\clickhouse\columns_all.json"
+
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            columns_data = json.load(f)
+    except Exception as e:
+        return HTMLResponse(content=f"<h2>Ошибка загрузки JSON: {e}</h2>", status_code=500)
+
+    # Общие поля
+    common_fields = [
+        "id", "partition_date", "title", "contract_type",
+        "link__rel", "link__type", "link__href", "modified", "content__type"
+    ]
+
+    # Подготовка групп
+    tabs = {
+        "AWARD": [],
+        "IDV": [],
+        "OTHERTRANSACTIONAWARD": [],
+        "OTHERTRANSACTIONIDV": []
+    }
+
+    for field, description in columns_data.items():
+        if field in common_fields:
+            continue
+        if field.startswith("content__award__"):
+            tabs["AWARD"].append((field, description))
+        elif field.startswith("content__IDV__"):
+            tabs["IDV"].append((field, description))
+        elif field.startswith("content__OtherTransactionAward__"):
+            tabs["OTHERTRANSACTIONAWARD"].append((field, description))
+        elif field.startswith("content__OtherTransactionIDV__"):
+            tabs["OTHERTRANSACTIONIDV"].append((field, description))
+
+    # Вывод шаблона
+    return templates.TemplateResponse("contracts-descriptions.html", {
+        "request": request,
+        "common": [(f, columns_data.get(f, "")) for f in common_fields],
+        "tabs": tabs
+    })
+
+
 
 # Запуск:
 # uvicorn src.api.app:app --reload

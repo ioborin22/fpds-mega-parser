@@ -1,26 +1,34 @@
 import re
+from pathlib import Path
+import sys
 
-# Пути к файлам
-schema_file = "/Users/iliaoborin/fpds/create_clickhouse_table.py"
-output_file = "/Users/iliaoborin/fpds/src/fpds/cli/parts/bool_fields.py"
+# ✅ Для поддержки Unicode в консоли Windows
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 
-# Читаем содержимое файла со схемой таблицы
-with open(schema_file, "r", encoding="utf-8") as file:
+# Пути к файлам (Windows)
+schema_file = Path(r"C:\Users\win11\Projects\fpds\create_clickhouse_table.py")
+output_file = Path(r"C:\Users\win11\Projects\fpds\src\fpds\cli\parts\bool_fields.py")
+
+# Читаем схему таблицы
+with schema_file.open("r", encoding="utf-8") as file:
     schema_text = file.read()
 
-# Регулярное выражение для поиска булевых полей (ищет перед Nullable(UInt8))
-bool_pattern = re.compile(r'`?([\w\d_]+)`?\s+Nullable\(UInt8\)')
-
-# Извлекаем все булевые поля
+# Регулярка для поиска булевых полей
+bool_pattern = re.compile(r'^\s*([\w__]+)\s+Nullable\(UInt8\)', re.MULTILINE)
 bool_fields = bool_pattern.findall(schema_text)
 
-# Генерируем текст для записи в файл
+# Генерируем Python-массив
 bool_fields_text = 'bool_fields = [\n'
 bool_fields_text += "\n".join([f'    "{field}",' for field in bool_fields])
 bool_fields_text += "\n]"
 
-# Записываем в файл
-with open(output_file, "w", encoding="utf-8") as file:
+# Сохраняем результат
+with output_file.open("w", encoding="utf-8") as file:
     file.write(bool_fields_text)
 
-print(f"Файл {output_file} успешно создан.")
+# Вывод результата
+print(f"[OK] Файл успешно создан: {output_file}")
+print(f"[INFO] Всего булевых полей: {len(bool_fields)}")

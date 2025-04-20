@@ -175,7 +175,7 @@ def process_data_and_insert(file_data):
                     print(
                         f"✅ Вставлено {total_inserted}/{expected_records} записей ({(total_inserted/expected_records)*100:.2f}%)")
                     time.sleep(2)
-                    update_status(file_id, "clickhouse_loaded", total_inserted)
+                    # update_status(file_id, "clickhouse_loaded", total_inserted)
                     batch = []
 
             # Вставить остатки

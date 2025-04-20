@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contracts Field Descriptions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2 {
+            margin-top: 30px;
+        }
+        .tabs {
+            display: flex;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .tabs button {
+            padding: 10px 20px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tabs button.active {
+            background: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 5px;
+            font-size: 90%;
+        }
+    </style>
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".tabs button").forEach(btn => btn.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            document.getElementById("btn-" + tabId).classList.add("active");
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            showTab("AWARD");
+        });
+    </script>
+</head>
+<body>
+
+    <h1>Contract Fields Description</h1>
+
+    <h2>Common Fields</h2>
+    <ul>
+        {% for field, desc in common %}
+        <li><code>{{ field }}</code>: {{ desc }}</li>
+        {% endfor %}
+    </ul>
+
+    <div class="tabs">
+        {% for tab_name in tabs.keys() %}
+        <button id="btn-{{ tab_name }}" onclick="showTab('{{ tab_name }}')">{{ tab_name }}</button>
+        {% endfor %}
+    </div>
+
+    {% for tab_name, fields in tabs.items() %}
+    <div class="tab-content" id="{{ tab_name }}">
+        <h2>{{ tab_name }} Fields</h2>
+        {% if fields %}
+            <ol>
+            {% for field, desc in fields %}
+                <li><code>{{ field }}</code>: {{ desc }}</li>
+            {% endfor %}
+            </ol>
+        {% else %}
+            <p>No fields in this group.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</body>
+</html>
