@@ -9,8 +9,8 @@ except Exception:
     pass
 
 # Пути к файлам (Windows)
-schema_file = Path(r"C:\Users\win11\Projects\fpds\create_clickhouse_table.py")
-output_file = Path(r"C:\Users\win11\Projects\fpds\src\fpds\cli\parts\bool_fields.py")
+schema_file = Path(r"C:\Users\iobor\Projects\fpds\create_clickhouse_table.py")
+output_file = Path(r"C:\Users\iobor\Projects\fpds\src\fpds\cli\parts\bool_fields.py")
 
 # Читаем схему таблицы
 with schema_file.open("r", encoding="utf-8") as file:

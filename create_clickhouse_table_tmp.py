@@ -7,15 +7,15 @@ RESET = "\033[0m"  # Сброс цвета
 
 # Подключение к ClickHouse
 client = Client(host='localhost', port=9000, user='default',
-                password='12345', database='fpds_clickhouse')
+                password='', database='fpds_clickhouse')
 
 # Удаление старой таблицы (если есть)
-# client.execute("DROP TABLE IF EXISTS raw_contracts;")
-# print(f"{RED}Таблица raw_contracts удалена.{RESET}")  # 🔴 Красный текст
+client.execute("DROP TABLE IF EXISTS raw_contracts_tmp;")
+print(f"{RED}Таблица raw_contracts_tmp удалена.{RESET}")  # 🔴 Красный текст
 
 # Создание новой таблицы
 client.execute("""
-CREATE TABLE raw_contracts (
+CREATE TABLE raw_contracts_tmp (
                
     -- General Content Data
     
@@ -1162,10 +1162,9 @@ CREATE TABLE raw_contracts (
     content__OtherTransactionIDV__genericTags__genericBooleans__genericBoolean03 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic boolean 03 for Other Transaction IDV.' CODEC(ZSTD(3)),
     content__OtherTransactionIDV__genericTags__genericBooleans__genericBoolean04 Nullable(UInt8) DEFAULT NULL COMMENT 'Generic boolean 04 for Other Transaction IDV.' CODEC(ZSTD(3)),
 
-
 ) ENGINE = MergeTree()
 ORDER BY id
 PARTITION BY (partition_date)
 """)
 
-print(f"{GREEN}Новая таблица raw_contracts создана!{RESET}")  # 🟢 Зелёный текст
+print(f"{GREEN}Новая таблица raw_contracts_tmp создана!{RESET}")  # 🟢 Зелёный текст

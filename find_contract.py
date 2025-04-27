@@ -2,10 +2,10 @@ import json
 from pathlib import Path
 
 # Указываем путь к исходному JSON-файлу
-input_file = Path("/Volumes/T7/data/1988/01_15.json")
+input_file = Path(r"D:\data\2022\06_09.json")
 
 # Путь для сохранения найденного контракта
-output_file = Path("/Users/iliaoborin/fpds/data") / \
+output_file = Path("C:/Users/iobor/Projects/fpds/data") / \
 f"{input_file.stem}_filtered.json"
 
 
@@ -42,4 +42,4 @@ def find_and_save_contract(input_path, output_path, target_key):
 
 # Запуск скрипта
 find_and_save_contract(input_file, output_file,
-                       "content__IDV__contractMarketingData__emailAddress")
+                       "content__IDV__vendor__vendorSiteDetails__divisionNumberOrOfficeCode")

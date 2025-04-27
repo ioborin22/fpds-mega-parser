@@ -4,6 +4,9 @@ Base classes for FPDS XML elements.
 author: derek663@gmail.com
 last_updated: 08/21/2024
 """
+import ssl
+import certifi
+import aiohttp
 
 import asyncio
 import multiprocessing
@@ -129,7 +132,9 @@ class fpdsRequest(fpdsMixin):
     def initial_request(self) -> ElementTree:
         """Send initial request to FPDS Atom feed and returns first page."""
         encoded_params = parse.urlencode({"q": self.search_params})
-        with urlopen(f"{self.url_base}&{encoded_params}") as response:
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+
+        with urlopen(f"{self.url_base}&{encoded_params}", context=ssl_context) as response:
             body = response.read()
 
         content_tree = self.convert_to_lxml_tree(body.decode("utf-8"))
@@ -147,9 +152,11 @@ class fpdsRequest(fpdsMixin):
 
         if not self.links:
             return []
+        
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
 
         async with semaphore:
-            async with ClientSession() as session:
+            async with ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
                 tasks = [self.convert(session, link) for link in self.links]
                 return await asyncio.gather(*tasks)
 

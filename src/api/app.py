@@ -10,7 +10,7 @@ from xml.etree import ElementTree as ET
 
 # 📂 Путь к HTML-шаблонам
 templates = Jinja2Templates(
-    directory=r"C:\Users\win11\Projects\fpds\src\web\templates"
+    directory=r"C:\Users\iobor\Projects\fpds\src\web\templates"
 )
 
 # 🚀 FastAPI приложение
@@ -225,7 +225,7 @@ async def clickhouse_info(request: Request):
 async def contracts_descriptions(request: Request):
     import json
 
-    json_path = r"C:\Users\win11\Projects\fpds\documentation\clickhouse\columns_all.json"
+    json_path = r"C:\Users\iobor\Projects\fpds\documentation\clickhouse\columns_all.json"
 
     try:
         with open(json_path, "r", encoding="utf-8") as f:

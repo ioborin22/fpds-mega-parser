@@ -1,12 +1,11 @@
 import re
 import json
-import os
 from collections import OrderedDict
 from pathlib import Path
 
 # Файлы
-schema_file = Path(r"C:\Users\win11\Projects\fpds\create_clickhouse_table.py")
-output_file = Path(r"C:\Users\win11\Projects\fpds\documentation\clickhouse\columns_all.json")
+schema_file = Path(r"C:\Users\iobor\Projects\fpds\create_clickhouse_table.py")
+output_file = Path(r"C:\Users\iobor\Projects\fpds\documentation\clickhouse\columns_all.json")
 output_file.parent.mkdir(parents=True, exist_ok=True)
 
 # Обязательные поля — в начале

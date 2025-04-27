@@ -2,9 +2,9 @@ import subprocess
 
 # Пути к скриптам
 scripts = [
-    r"C:\Users\win11\Projects\fpds\create_bool_fields.py",
-    r"C:\Users\win11\Projects\fpds\create_columns.py",
-    r"C:\Users\win11\Projects\fpds\create_contract_parser.py"
+    r"C:\Users\iobor\Projects\fpds\create_bool_fields.py",
+    r"C:\Users\iobor\Projects\fpds\create_columns.py",
+    r"C:\Users\iobor\Projects\fpds\create_contract_parser.py"
 ]
 
 print("🚀 Запуск генерации всех файлов...")

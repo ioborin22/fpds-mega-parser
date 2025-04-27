@@ -4,7 +4,7 @@ import click
 
 # Импорт команд для парсинга
 from fpds.cli.parse_clickhouse import parse_clickhouse as _parse_clickhouse
-from fpds.cli.parse_sql import parse_sql as _parse_sql
+# from fpds.cli.parse_sql import parse_sql as _parse_sql
 
 # Импорт команды для скачивания одной даты
 # <<< сюда импортируешь свою новую функцию
@@ -31,7 +31,7 @@ def parse():
 
 # Добавляем подкоманды в `parse`
 parse.add_command(_parse_clickhouse, name="clickhouse")
-parse.add_command(_parse_sql, name="sql")
+# parse.add_command(_parse_sql, name="sql")
 
 # Регистрируем команду `parse`
 cli.add_command(parse)
