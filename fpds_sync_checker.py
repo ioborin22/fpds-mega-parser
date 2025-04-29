@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 from clickhouse_driver import Client
 from datetime import datetime
+import requests
 
 client = Client(
             host='localhost',
@@ -81,13 +82,34 @@ def compare_data():
             issues.append((date, ch_count, mysql_count))
     return issues
 
+def check_fpds_available(date):
+    date_slash = date.replace("-", "/")
+    url = f"https://www.fpds.gov/ezsearch/FEEDS/ATOM?s=FPDS&FEEDNAME=PUBLIC&q=SIGNED_DATE:[{date_slash},{date_slash}]"
 
+    try:
+        response = requests.get(url, timeout=20)
+        if response.status_code != 200:
+            print(f"❌ FPDS ответ: {response.status_code}")
+            return False
+        if len(response.content) < 1000:  # подозрительно пустой
+            print(f"❌ FPDS ответ слишком короткий: {len(response.content)} байт")
+            return False
+        return True
+    except Exception as e:
+        print(f"❌ Ошибка доступа к FPDS: {e}")
+        return False
+    
 def main():
     issues = compare_data()
     if issues:
         date, ch_count, mysql_count = issues[0]
         diff = ch_count - mysql_count
         print(f"🚨 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Найдено расхождение: Дата: {date}, ClickHouse: {ch_count}, FPDS: {mysql_count}, Разница: {diff}")
+
+        # Проверяем fpds available
+        if not check_fpds_available(date):
+            print(f"⛔ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] FPDS не отвечает — пропускаем удаление и вставку.")
+            return
 
         # ✅ Шаг 1: DROP ClickHouse
         print(f"🗑  [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Удаляем партицию за дату {date}...")
