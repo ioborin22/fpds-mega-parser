@@ -45,11 +45,10 @@ def fetch_fpds_data(date, start=None):
         print(f"❌ Ошибка загрузки FPDS для {date}: {e}")
         return None
 
-
 def count_fpds_records(date):
     xml_data = fetch_fpds_data(date)
     if not xml_data:
-        return 0
+        return None  # None означает ошибку FPDS
 
     try:
         tree = etree.fromstring(xml_data)
@@ -69,7 +68,7 @@ def count_fpds_records(date):
 
         last_page_data = fetch_fpds_data(date, start=last_start)
         if not last_page_data:
-            return entry_count_first
+            return None
 
         last_tree = etree.fromstring(last_page_data)
         last_entries = last_tree.findall(".//atom:entry", namespaces=ns)
@@ -81,7 +80,7 @@ def count_fpds_records(date):
 
     except Exception as e:
         print(f"⚠️ Ошибка парсинга FPDS XML для {date}: {e}")
-        return 0
+        return None
 
 
 # ---------------------- ClickHouse ---------------------- #
@@ -104,7 +103,7 @@ def insert_or_update(date, fpds_count, clickhouse_count):
 
     if row:
         old_fpds, old_ch = row
-        if old_fpds != fpds_count or old_ch != clickhouse_count:
+        if (fpds_count is not None and fpds_count != 0) and (old_fpds != fpds_count or old_ch != clickhouse_count):
             cursor.execute("""
                 UPDATE signed_date_records 
                 SET fpds_records = %s, clickhouse_records = %s, updated_at = %s 
@@ -112,13 +111,16 @@ def insert_or_update(date, fpds_count, clickhouse_count):
             """, (fpds_count, clickhouse_count, now, date))
             print(f"🔄 Обновлено {date}: FPDS={fpds_count}, CH={clickhouse_count}")
         else:
-            print(f"✅ {date} — без изменений")
+            print(f"⏭ Пропущено {date}: нет новых данных от FPDS или всё совпадает.")
     else:
-        cursor.execute("""
-            INSERT INTO signed_date_records (signed_date, fpds_records, clickhouse_records, updated_at)
-            VALUES (%s, %s, %s, %s)
-        """, (date, fpds_count, clickhouse_count, now))
-        print(f"➕ Добавлено {date}: FPDS={fpds_count}, CH={clickhouse_count}")
+        if fpds_count is not None and fpds_count != 0:
+            cursor.execute("""
+                INSERT INTO signed_date_records (signed_date, fpds_records, clickhouse_records, updated_at)
+                VALUES (%s, %s, %s, %s)
+            """, (date, fpds_count, clickhouse_count, now))
+            print(f"➕ Добавлено {date}: FPDS={fpds_count}, CH={clickhouse_count}")
+        else:
+            print(f"⚠️ Пропущено {date}: FPDS не дал ответа.")
 
     conn.commit()
     cursor.close()
@@ -141,15 +143,17 @@ def main():
         print(f"\n📅 Обработка {iso_date}:")
 
         fpds_count = count_fpds_records(fpds_format_date)
+        if fpds_count is None:
+            print(f"❌ Пропуск {iso_date} — FPDS не ответил.")
+            current_date += timedelta(days=1)
+            continue
+
         ch_count = get_clickhouse_count(iso_date)
 
         print(f"   📄 FPDS: {fpds_count}")
         print(f"   💽 ClickHouse: {ch_count}")
 
-        if fpds_count == 0 and ch_count == 0:
-            print("⛔ Пропущено — нет данных в обоих источниках.")
-        else:
-            insert_or_update(iso_date, fpds_count, ch_count)
+        insert_or_update(iso_date, fpds_count, ch_count)
 
         current_date += timedelta(days=1)
 
@@ -157,8 +161,6 @@ def main():
     minutes = int(elapsed // 60)
     seconds = int(elapsed % 60)
     print(f"\n✅ Сбор и обновление данных завершены за {minutes} мин {seconds} сек.")
-
-
 
 
 if __name__ == "__main__":

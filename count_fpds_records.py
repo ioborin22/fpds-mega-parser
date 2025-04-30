@@ -129,7 +129,7 @@ def insert_into_db(date, records):
 
 def main():
     """ Основная функция """
-    start_date = datetime(1998, 7, 1)
+    start_date = datetime(1957, 10, 1)
     today_date = datetime.now().date()
     current_date = start_date
 
