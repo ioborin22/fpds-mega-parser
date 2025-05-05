@@ -266,6 +266,9 @@ async def contracts_descriptions(request: Request):
         "tabs": tabs
     })
 
+@app.get("/sql", response_class=HTMLResponse)
+async def get_sql_page(request: Request):
+    return templates.TemplateResponse("sql.html", {"request": request})
 
 
 # Запуск:

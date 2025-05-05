@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 # Путь к основному скрипту
+# SCRIPT_PATH = Path(r"C:\Users\iobor\Projects\fpds\insert_json_clickhouse.py")
 SCRIPT_PATH = Path(r"C:\Users\iobor\Projects\fpds\fpds_sync_checker.py")
 
 # Путь к интерпретатору Python в активированном окружении

@@ -24,10 +24,6 @@ def log_error_to_file(error_msg, file_path):
         f.write(error_msg)
         f.write('\n' + '='*80 + '\n')
 
-# 📌 Настройки
-BATCH_SIZE = 1000
-MAX_MEMORY_ERRORS = 10  # Максимально допустимое количество ошибок памяти подряд
-
 # ✅ Подключение к ClickHouse
 print("🔄 Проверяем подключение к ClickHouse...")
 try:
@@ -38,39 +34,6 @@ try:
 except Exception as e:
     print(f"❌ Ошибка подключения к ClickHouse: {e}")
     sys.exit(1)
-
-
-def insert_batch_with_retry(client, table, batch, columns, file_id):
-    wait_time = 10
-    memory_error_count = 0
-    batch_size = len(batch)
-
-    while True:
-        try:
-            client.insert(table, batch, column_names=columns)
-            memory_error_count = 0  # Успешная вставка - сбрасываем счётчик
-            break
-        except Exception as e:
-            if "MEMORY_LIMIT_EXCEEDED" in str(e):
-                memory_error_count += 1
-                print(f"⚠️ Ошибка памяти #{memory_error_count}: {e}")
-
-                if memory_error_count >= MAX_MEMORY_ERRORS:
-                    print(
-                        "❌ Превышено количество ошибок памяти. Останавливаем процесс!")
-                    update_status(file_id, "clickhouse_memory_failed")
-                    sys.exit(10)  # Завершаем процесс с кодом 10
-
-                print(f"⌛ Ждем {wait_time} секунд перед повторной попыткой...")
-                time.sleep(wait_time)
-                wait_time += 10
-
-                if batch_size > 100:
-                    batch_size -= 100
-
-                batch = batch[:batch_size]
-            else:
-                raise
 
 def get_db_connection():
     try:
@@ -134,19 +97,20 @@ def process_data_and_insert(file_data):
 
     print(f"📖 Открываем JSON-файл: {file_path}")
 
-    total_inserted = inserted_records
-    batch = []
+    total_inserted = 0
+    all_data = []
+    partition_date = None
 
     try:
-        with open(file_path, "r") as f:
-            parser = ijson.items(f, 'item')  # Читаем элементы массива JSON
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-            for idx, contract in enumerate(parser):
+            for idx, contract in enumerate(data):
                 if idx < inserted_records:
-                    continue  # Пропустить уже вставленные
+                    continue
 
-                contract = {k: v for k, v in contract.items(
-                ) if k in columns or str(v).strip()}
+                contract = {k: v for k, v in contract.items()
+                            if k in columns or str(v).strip()}
 
                 signed_date_keys = [
                     "content__award__relevantContractDates__signedDate",
@@ -154,49 +118,49 @@ def process_data_and_insert(file_data):
                     "content__OtherTransactionAward__contractDetail__relevantContractDates__signedDate",
                     "content__OtherTransactionIDV__contractDetail__relevantContractDates__signedDate",
                 ]
-                signed_date = next((contract.get(
-                    k) for k in signed_date_keys if k in contract and contract[k]), None)
+                signed_date = next((contract.get(k)
+                                    for k in signed_date_keys if k in contract and contract[k]), None)
                 if not signed_date:
                     raise ValueError(
                         f"❌ Ошибка! В контракте отсутствует `signed_date`. Контракт: {json.dumps(contract, indent=2)}")
 
                 dt = pendulum.from_format(signed_date, "YYYY-MM-DD HH:mm:ss")
+
+                # запоминаем partition_date из первой записи
+                if not partition_date:
+                    partition_date = dt.to_date_string()
+
                 contract = process_booleans(contract, bool_fields)
                 contract_data = extract_contract_data(contract, dt.date())
                 log_missing_keys(contract, columns, file_path)
 
-                batch.append(contract_data)
+                all_data.append(contract_data)
 
-                # Если набрали BATCH_SIZE - вставляем
-                if len(batch) >= BATCH_SIZE:
-                    insert_batch_with_retry(
-                        client, "raw_contracts", batch, columns, file_id)
-                    total_inserted += len(batch)
-                    print(
-                        f"✅ Вставлено {total_inserted}/{expected_records} записей ({(total_inserted/expected_records)*100:.2f}%)")
-                    time.sleep(2)
-                    # update_status(file_id, "clickhouse_loaded", total_inserted)
-                    batch = []
+        if not all_data:
+            print("⚠️ Нет новых данных для вставки.")
+            update_status(file_id, "clickhouse_loaded", inserted_records)
+            return
 
-            # Вставить остатки
-            if batch:
-                insert_batch_with_retry(
-                    client, "raw_contracts", batch, columns, file_id)
-                total_inserted += len(batch)
-                update_status(file_id, "clickhouse_loaded", total_inserted)
-
-        if total_inserted >= expected_records:
-            update_status(file_id, "clickhouse_loaded", total_inserted)
-            print("✅ Файл полностью загружен!")
+        # ✅ Удаление партиции до вставки
+        if partition_date:
+            print(f"🗑 Удаляем партицию: {partition_date}")
+            client.command(f"ALTER TABLE raw_contracts DROP PARTITION '{partition_date}'")
+            print("✅ Партиция удалена.")
         else:
-            update_status(file_id, "clickhouse_load_failed", total_inserted)
-            print("⚠️ Не все записи загружены!")
+            print("⚠️ partition_date не определена — пропуск удаления партиции.")
+
+        # ✅ Вставка всех данных
+        client.insert("raw_contracts", all_data, column_names=columns)
+        total_inserted = len(all_data)
+        update_status(file_id, "clickhouse_loaded", total_inserted)
+        print(f"✅ Файл полностью загружен: {total_inserted} записей")
 
     except Exception as e:
         full_trace = traceback.format_exc()
         print(f"❌ Ошибка обработки файла: {e}")
         log_error_to_file(full_trace, str(file_path))
         update_status(file_id, "clickhouse_load_failed", total_inserted)
+
 
 
 # 🔄 Запуск
