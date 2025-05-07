@@ -132,7 +132,7 @@ def insert_or_update(date, fpds_count, clickhouse_count):
 def main():
     start_time = time.time()
 
-    start_date = datetime(1957, 10, 1)
+    start_date = datetime(2018, 6, 1)
     today_date = datetime.now().date()
     current_date = start_date
 

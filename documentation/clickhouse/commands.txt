@@ -39,11 +39,11 @@ SELECT * FROM fpds_clickhouse.raw_contracts LIMIT 50;
 
 Посмотреть сколько записей за каждый год
 SELECT 
-    partition_year, 
+    partition_date, 
     count(*) AS records
 FROM fpds_clickhouse.raw_contracts
-GROUP BY partition_year
-ORDER BY partition_year;
+GROUP BY partition_date
+ORDER BY partition_date;
 
 Сбросить
 UPDATE insert_json_clickhouse 
