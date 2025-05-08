@@ -6,16 +6,16 @@ src_path = Path(__file__).resolve().parent / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-import json
 import ijson
 import clickhouse_connect
-import pendulum
 
 from fpds.cli.parts.utils import process_booleans, log_missing_keys
 from fpds.cli.parts.contract_parser import extract_contract_data
 from fpds.cli.parts.columns import columns
 from fpds.cli.parts.bool_fields import bool_fields
 from datetime import datetime
+import gc
+import time
 
 def insert_direct(date_str):
     year, month, day = date_str.split("-")
@@ -44,7 +44,7 @@ def insert_direct(date_str):
             if not signed_date:
                 continue
 
-            dt = pendulum.from_format(signed_date, "YYYY-MM-DD HH:mm:ss")
+            dt = datetime.strptime(signed_date, "%Y-%m-%d %H:%M:%S")
             contract = process_booleans(contract, bool_fields)
             contract_data = extract_contract_data(contract, dt.date())
             log_missing_keys(contract, columns, file_path)
@@ -55,7 +55,11 @@ def insert_direct(date_str):
         client.insert("raw_contracts", all_data, column_names=columns)
         inserted = len(all_data)
         print(f"✅ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Вставлено {inserted} записей")
-
+    # 🧹 Явная очистка памяти
+    del all_data, contract_data, contract, parser
+    gc.collect()
+    print(f"😴 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Sleep 5 sec.")
+    time.sleep(5)
     print(f"🏁 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Загрузка завершена.")
 
 if __name__ == "__main__":

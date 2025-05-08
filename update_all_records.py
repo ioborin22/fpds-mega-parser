@@ -109,7 +109,7 @@ def insert_or_update(date, fpds_count, clickhouse_count):
                 SET fpds_records = %s, clickhouse_records = %s, updated_at = %s 
                 WHERE signed_date = %s
             """, (fpds_count, clickhouse_count, now, date))
-            print(f"🔄 Обновлено {date}: FPDS={fpds_count}, CH={clickhouse_count}")
+            print(f"✅ Обновлено {date}: FPDS={fpds_count}, CH={clickhouse_count}")
         else:
             print(f"⏭ Пропущено {date}: нет новых данных от FPDS или всё совпадает.")
     else:
@@ -132,7 +132,7 @@ def insert_or_update(date, fpds_count, clickhouse_count):
 def main():
     start_time = time.time()
 
-    start_date = datetime(2018, 6, 1)
+    start_date = datetime(1957, 10, 1)
     today_date = datetime.now().date()
     current_date = start_date
 

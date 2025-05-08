@@ -144,6 +144,7 @@ class fpdsRequest(fpdsMixin):
         """Retrieves content from FPDS ATOM feed."""
         async with session.get(link) as response:
             content = await response.read()
+            await asyncio.sleep(0.1)  # Optional delay to avoid overwhelming the server
             xml = fpdsXML(content=self.convert_to_lxml_tree(content))
             return xml
 
@@ -178,6 +179,7 @@ class fpdsRequest(fpdsMixin):
         data = await self.fetch()
 
         # for parallel processing
-        with ProcessPoolExecutor(max_workers=num_processes) as pool:
+        #with ProcessPoolExecutor(max_workers=num_processes) as pool: 
+        with ProcessPoolExecutor(max_workers=4) as pool: # Adjust the number of workers as needed
             results = pool.map(self._jsonify, data)
         return results

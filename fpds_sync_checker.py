@@ -106,12 +106,19 @@ def main():
         diff = ch_count - mysql_count
         print(f"🚨 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Найдено расхождение: Дата: {date}, ClickHouse: {ch_count}, FPDS: {mysql_count}, Разница: {diff}")
 
-        # Проверяем fpds available
+        # Проверяем доступность FPDS
         if not check_fpds_available(date):
-            print(f"⛔ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] FPDS не отвечает — пропускаем удаление и вставку.")
+            print(f"⛔ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] FPDS не отвечает — пропускаем скачивание, удаление и вставку.")
             return
 
-        # ✅ Шаг 1: DROP ClickHouse
+        # ✅ Скачиваем JSON для этой даты
+        date_slash = date.replace("-", "/")
+        result = subprocess.run(["fpds", "get", date_slash])
+        if result.returncode != 0:
+            print(f"⛔ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Ошибка при скачивании JSON — пропуск.")
+            return
+
+        # ✅ Удаляем только если скачивание прошло успешно
         print(f"🗑  [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Удаляем партицию за дату {date}...")
         try:
             drop_partition_sql = f"ALTER TABLE raw_contracts DROP PARTITION '{date}'"
@@ -119,18 +126,14 @@ def main():
             print(f"🔥 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Партиция успешно удалена.")
         except Exception as e:
             print(f"⚠️ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Ошибка удаления партиции: {e}")
+            return  # не продолжаем, если не удалось удалить
 
-        # ✅ Шаг 2: Скачиваем JSON для этой даты
-        date_slash = date.replace("-", "/")  # преобразуем в формат YYYY/MM/DD
-        subprocess.run(["fpds", "get", date_slash])
-
-        # ✅ Шаг 3: Вставка напрямую
+        # ✅ Вставка напрямую
         subprocess.run(["python", "insert_json_clickhouse_direct.py", date])
 
-        # ✅ Шаг 4: Перемещаем файл
+        # ✅ Перемещение файла
         year = date[:4]
         month_day = date[5:7] + "_" + date[8:10]
-
         source_file = Path(rf"C:\Users\iobor\Projects\fpds\data\{year}\{month_day}.json")
         destination_file = Path(rf"D:\data\{year}\{month_day}.json")
 
@@ -144,6 +147,7 @@ def main():
                 print(f"⚠️ Файл {source_file} не найден, пропуск перемещения.")
         except Exception as e:
             print(f"⚠️ Ошибка при перемещении файла: {e}")
+
 
 
 
